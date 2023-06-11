@@ -5,7 +5,7 @@ Work with JavaScript values in OCaml.
 
 ## Examples
 
-```
+```ocaml
 (* Bind the global document value. *)
 let document = Jx.global "document"
 
