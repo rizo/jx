@@ -1,0 +1,10 @@
+(executable
+  (name index)
+  (libraries js_ffi)
+  (js_of_ocaml (flags --target-env=browser --opt=3 --pretty))
+  (modes js))
+
+
+(alias
+ (name all)
+ (deps index.html))
