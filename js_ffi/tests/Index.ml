@@ -7,8 +7,8 @@ module Node : sig
   type super = [ self | `Event_target ]
   type t = self Js.obj
 
-  external of_js : Js.t -> [< super ] Js.obj = "%identity"
-  external to_js : [> self ] Js.obj -> Js.t = "%identity"
+  external of_any : Js.any -> [< super ] Js.obj = "%identity"
+  external to_any : [> self ] Js.obj -> Js.any = "%identity"
 
   val append_child :
     node:[> self ] Js.obj -> [> self ] Js.obj -> [< super ] Js.obj
@@ -17,11 +17,11 @@ end = struct
   type super = [ self | `Event_target ]
   type t = self Js.obj
 
-  external of_js : Js.t -> [< super ] Js.obj = "%identity"
-  external to_js : [> self ] Js.obj -> Js.t = "%identity"
+  external of_any : Js.any -> [< super ] Js.obj = "%identity"
+  external to_any : [> self ] Js.obj -> Js.any = "%identity"
 
   let append_child ~node this =
-    of_js (Js.meth_call this "appendChild" [| to_js node |])
+    of_any (Js.meth_call this "appendChild" [| to_any node |])
 end
 
 module Element : sig
@@ -29,15 +29,15 @@ module Element : sig
   type super = [ self | Node.super ]
   type t = self Js.obj
 
-  external of_js : Js.t -> [< super ] Js.obj = "%identity"
-  external to_js : [> self ] Js.obj -> Js.t = "%identity"
+  external of_any : Js.any -> [< super ] Js.obj = "%identity"
+  external to_any : [> self ] Js.obj -> Js.any = "%identity"
 end = struct
   type self = [ `Element ]
   type super = [ self | Node.super ]
   type t = self Js.obj
 
-  external of_js : Js.t -> [< super ] Js.obj = "%identity"
-  external to_js : [> self ] Js.obj -> Js.t = "%identity"
+  external of_any : Js.any -> [< super ] Js.obj = "%identity"
+  external to_any : [> self ] Js.obj -> Js.any = "%identity"
 end
 
 module Text : sig
@@ -45,8 +45,8 @@ module Text : sig
   type super = [ self | Node.super ]
   type t = self Js.obj
 
-  external of_js : Js.t -> [< super ] Js.obj = "%identity"
-  external to_js : [> self ] Js.obj -> Js.t = "%identity"
+  external of_any : Js.any -> [< super ] Js.obj = "%identity"
+  external to_any : [> self ] Js.obj -> Js.any = "%identity"
   val make : ?data:string -> unit -> [< super ] Js.obj
 end = struct
   type self = [ `Text ]
@@ -55,8 +55,8 @@ end = struct
 
   let t = Js.raw "Text"
 
-  external of_js : Js.t -> [< super ] Js.obj = "%identity"
-  external to_js : [> self ] Js.obj -> Js.t = "%identity"
+  external of_any : Js.any -> [< super ] Js.obj = "%identity"
+  external to_any : [> self ] Js.obj -> Js.any = "%identity"
 
   let make ?data () =
     let data = E.option_as_undefined E.string data in
@@ -68,8 +68,8 @@ module Html_collection : sig
   type super = self
   type t = self Js.obj
 
-  external of_js : Js.t -> [< super ] Js.obj = "%identity"
-  external to_js : [> self ] Js.obj -> Js.t = "%identity"
+  external of_any : Js.any -> [< super ] Js.obj = "%identity"
+  external to_any : [> self ] Js.obj -> Js.any = "%identity"
   val length : [> self ] Js.obj -> int
   val item : index:int -> t -> [< Element.super ] Js.obj option
 end = struct
@@ -79,13 +79,13 @@ end = struct
 
   let t = Js.raw "HTMLCollection"
 
-  external of_js : Js.t -> [< super ] Js.obj = "%identity"
-  external to_js : [> self ] Js.obj -> Js.t = "%identity"
+  external of_any : Js.any -> [< super ] Js.obj = "%identity"
+  external to_any : [> self ] Js.obj -> Js.any = "%identity"
 
   let length this = D.int (Js.get this "length")
 
   let item ~index this =
-    D.nullable_as_option Element.of_js
+    D.nullable_as_option Element.of_any
       (Js_ffi.meth_call this "item" [| E.int index |])
 end
 
@@ -95,8 +95,8 @@ module Document : sig
   type t = self Js.obj
 
   external super : t -> [< super ] Js.obj = "%identity"
-  external of_js : Js.t -> [< super ] Js.obj = "%identity"
-  external to_js : [> self ] Js.obj -> Js.t = "%identity"
+  external of_any : Js.any -> [< super ] Js.obj = "%identity"
+  external to_any : [> self ] Js.obj -> Js.any = "%identity"
   val make : unit -> [< super ] Js.obj
 
   val create_element :
@@ -126,32 +126,32 @@ end = struct
   let make () = Js_ffi.obj_new t [||]
 
   external super : t -> [< super ] Js.obj = "%identity"
-  external of_js : Js.t -> [< super ] Js.obj = "%identity"
-  external to_js : [> self ] Js.obj -> Js.t = "%identity"
+  external of_any : Js.any -> [< super ] Js.obj = "%identity"
+  external to_any : [> self ] Js.obj -> Js.any = "%identity"
 
   let create_element ~local_name ?options this =
     let options = E.option_as_undefined E.obj options in
-    Element.of_js
+    Element.of_any
       (Js.meth_call this "createElement"
          [| E.string_ascii local_name; options |])
 
   let create_text_node ~data this =
-    Text.of_js (Js.meth_call this "createTextNode" [| E.string_ascii data |])
+    Text.of_any (Js.meth_call this "createTextNode" [| E.string_ascii data |])
 
   let query_selector ~selectors this =
-    D.nullable_as_option Element.of_js
+    D.nullable_as_option Element.of_any
       (Js.meth_call this "querySelector" [| E.string_ascii selectors |])
 
   let append ~nodes this =
     D.unit (Js_ffi.meth_call this "append" [| Obj.magic nodes |])
 
-  let children this = Html_collection.of_js (Js.get this "children")
+  let children this = Html_collection.of_any (Js.get this "children")
 end
 
 let parse_int1 str base =
   D.int (Js.fun_call (Js.raw "parseInt") [| E.string_ascii str; E.int base |])
 
-let document = Js.raw "document" |> Document.of_js
+let document = Js.raw "document" |> Document.of_any
 
 let () =
   Js.debug "starting...";
@@ -176,6 +176,6 @@ let () =
   ()
 
 module Test1 = struct
-  let decode_complex_1 (js : Js.t) =
+  let decode_complex_1 (js : Js.any) =
     D.undefined (D.array (D.nullable D.float)) js
 end

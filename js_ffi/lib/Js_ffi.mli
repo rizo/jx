@@ -1,10 +1,7 @@
 (** A thin bridge between the JS and ML worlds. *)
 
-type t
+type any
 (** An opaque JavaScript value. *)
-
-type js = t
-(** An alias for {!type:t}. *)
 
 type +'cls obj constraint 'cls = [> ]
 (** JavaScript object values. The type parameter ['cls] is used to differentiate
@@ -57,113 +54,113 @@ end
 *)
 
 module Encode : sig
-  external js : js -> js = "%identity"
+  external js : any -> any = "%identity"
   (** Identity encoder. *)
 
-  external any : 'a -> js = "%identity"
+  external any : 'a -> any = "%identity"
   (** Encode any value without performing runtime conversion. *)
 
-  external obj : 'a obj -> js = "%identity"
+  external obj : 'a obj -> any = "%identity"
   (** Encode an ML representation of a JS object as a JS value. *)
 
-  external int : int -> js = "%identity"
+  external int : int -> any = "%identity"
   (** Encode an ML integer as a JS number. *)
 
-  external char : char -> js = "%identity"
+  external char : char -> any = "%identity"
   (** Encode an ML character as a JS number. *)
 
-  external unit : unit -> js = "%identity"
+  external unit : unit -> any = "%identity"
   (** Encode an ML unit value as the JS [undefined] value. *)
 
-  external bool : bool -> js = "caml_js_from_bool"
+  external bool : bool -> any = "caml_js_from_bool"
   (** Encode an ML boolean as a JS boolean. *)
 
-  external float : float -> js = "caml_js_from_float"
+  external float : float -> any = "caml_js_from_float"
   (** Encode an ML float as a JavaScript number. *)
 
-  external string : string -> js = "caml_jsstring_of_string"
+  external string : string -> any = "caml_jsstring_of_string"
   (** Encode an arbitrary ML string as a JavaScript UTF-16 string. *)
 
-  external string_ascii : string -> js = "%identity"
+  external string_ascii : string -> any = "%identity"
   (** Encode an ML ASCII string as a JavaScript UTF-16 string. *)
 
-  val array : ('a -> js) -> 'a array -> js
+  val array : ('a -> any) -> 'a array -> any
   (** Encode an ML array as a JS array, converting the array values using the
       provided encoder. *)
 
-  external js_array : js array -> js = "caml_js_from_array"
+  external js_array : any array -> any = "caml_js_from_array"
   (** Encode an ML array of JS values as a JS array. The array values are not
       converted. *)
 
-  val nullable : ('a -> js) -> 'a nullable -> js
+  val nullable : ('a -> any) -> 'a nullable -> any
   (** Encode an ML nullable as a JS nullable value. *)
 
-  external js_nullable : js nullable -> js = "%identity"
+  external js_nullable : any nullable -> any = "%identity"
   (** Encode an ML nullable of a JS value as a JS value that can be null. The
       contained value is not converted. *)
 
-  val undefined : ('a -> js) -> 'a undefined -> js
+  val undefined : ('a -> any) -> 'a undefined -> any
   (** Encode an ML undefined as a JS value that can be undefined. *)
 
-  external js_undefined : js undefined -> js = "%identity"
+  external js_undefined : any undefined -> any = "%identity"
   (** Encode an ML undefined of a JS value as a JS value that can be undefined.
       The contained value is not converted. *)
 
-  val option_as_nullable : ('a -> js) -> 'a option -> js
+  val option_as_nullable : ('a -> any) -> 'a option -> any
   (** Encode an ML option as a JS value that can be null. The contained value is
       converted with the provided encoder. *)
 
-  val option_as_undefined : ('a -> js) -> 'a option -> js
+  val option_as_undefined : ('a -> any) -> 'a option -> any
   (** Encode an ML option as a JS value that can be undefined. The contained
       value is converted with the provided encoder. *)
 
-  external fun' : int -> (js -> _) -> js = "caml_js_wrap_callback_strict"
+  external fun' : int -> (any -> _) -> any = "caml_js_wrap_callback_strict"
   (** [fun' arity f] is the JavaScript representation of the OCaml function [f]
       with the given [arity]. *)
 end
 
 module Decode : sig
-  external js : js -> js = "%identity"
-  external any : js -> 'a = "%identity"
-  external obj : js -> 'a obj = "%identity"
-  external int : js -> int = "%identity"
-  external unit : js -> unit = "%identity"
-  external bool : js -> bool = "caml_js_to_bool"
-  external float : js -> float = "caml_js_to_float"
-  external string : js -> string = "caml_string_of_jsstring"
-  external string_ascii : js -> string = "%identity"
-  external js_array : js -> js array = "caml_js_to_array"
-  val array : (js -> 'a) -> js -> 'a array
-  val nullable : (js -> 'a) -> js -> 'a nullable
-  val undefined : (js -> 'a) -> js -> 'a undefined
-  val nullable_as_option : (js -> 'a) -> js -> 'a option
-  val undefined_as_option : (js -> 'a) -> js -> 'a option
+  external js : any -> any = "%identity"
+  external any : any -> 'a = "%identity"
+  external obj : any -> 'a obj = "%identity"
+  external int : any -> int = "%identity"
+  external unit : any -> unit = "%identity"
+  external bool : any -> bool = "caml_js_to_bool"
+  external float : any -> float = "caml_js_to_float"
+  external string : any -> string = "caml_string_of_jsstring"
+  external string_ascii : any -> string = "%identity"
+  external js_array : any -> any array = "caml_js_to_array"
+  val array : (any -> 'a) -> any -> 'a array
+  val nullable : (any -> 'a) -> any -> 'a nullable
+  val undefined : (any -> 'a) -> any -> 'a undefined
+  val nullable_as_option : (any -> 'a) -> any -> 'a option
+  val undefined_as_option : (any -> 'a) -> any -> 'a option
 end
 
 (** {2 Function} *)
 
-external fun_call : js -> js array -> js = "caml_js_fun_call"
+external fun_call : any -> any array -> any = "caml_js_fun_call"
 (** [fun_call f args] is [f(...args)]. [f] is assumed to represent a JavaScript
     function. *)
 
 (** {2 Object} *)
 
-external get : 'a obj -> string -> js = "caml_js_get"
+external get : 'a obj -> string -> any = "caml_js_get"
 (** [get obj prop] is [obj[prop]]. *)
 
-external set : 'a obj -> string -> js -> unit = "caml_js_set"
+external set : 'a obj -> string -> any -> unit = "caml_js_set"
 (** [set obj prop v] is [obj[prop] = v]. *)
 
 external del : 'a obj -> string -> unit = "caml_js_delete"
 (** [del obj prop] is [delete obj[prop]]. *)
 
-external obj : (string * js) array -> 'a obj = "caml_js_object"
+external obj : (string * any) array -> 'a obj = "caml_js_object"
 (** [obj [(prop1, v1); ...]] is [{prop1: v1, ... }]. *)
 
-external obj_new : js -> js array -> 'a obj = "caml_js_new"
+external obj_new : any -> any array -> 'a obj = "caml_js_new"
 (** [obj_new obj args] is [new obj(...args)]. *)
 
-external meth_call : 'a obj -> string -> js array -> js = "caml_js_meth_call"
+external meth_call : 'a obj -> string -> any array -> any = "caml_js_meth_call"
 (** [meth_call obj prop args] is [obj.prop(...args)]. *)
 
 (** {2 Global} *)
@@ -173,29 +170,29 @@ val global_this : 'a obj
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis}
       globalThis}. *)
 
-val global : string -> js
+val global : string -> any
 (** [global prop] is [get global_this prop], that is, [globalThis[prop]]. *)
 
 (** {2 equal} *)
 
-external equal : js -> js -> bool = "caml_js_equals"
+external equal : any -> any -> bool = "caml_js_equals"
 (** See
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Equality}
       Equality (==)}. *)
 
-external strict_equal : js -> js -> bool = "caml_js_strict_equals"
+external strict_equal : any -> any -> bool = "caml_js_strict_equals"
 (** See
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality}
       Strict equality (===)}. *)
 
 (** {2 type} *)
 
-external typeof : js -> string = "caml_js_typeof"
+external typeof : any -> string = "caml_js_typeof"
 (** See
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof}
       typeof}. *)
 
-external instanceof : 'a obj -> constr:js -> bool = "caml_js_instanceof"
+external instanceof : 'a obj -> constr:any -> bool = "caml_js_instanceof"
 (** See
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof}
       instanceof}. *)
@@ -214,7 +211,7 @@ external debugger : unit -> unit = "debugger"
 
 (** {2 unsafe} *)
 
-external raw : string -> js = "caml_pure_js_expr"
+external raw : string -> any = "caml_pure_js_expr"
 (** Unsafe pure JavaScript expression.
 
     Do {e not} use this for effectful expressions, if the resulting value is not
