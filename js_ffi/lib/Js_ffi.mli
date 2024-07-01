@@ -54,9 +54,6 @@ end
 *)
 
 module Encode : sig
-  external js : any -> any = "%identity"
-  (** Identity encoder. *)
-
   external any : 'a -> any = "%identity"
   (** Encode any value without performing runtime conversion. *)
 
@@ -120,7 +117,6 @@ module Encode : sig
 end
 
 module Decode : sig
-  external js : any -> any = "%identity"
   external any : any -> 'a = "%identity"
   external obj : any -> 'a obj = "%identity"
   external int : any -> int = "%identity"

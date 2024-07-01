@@ -73,7 +73,6 @@ external obj_new : any -> any array -> 'a obj = "caml_js_new"
 (* Encode *)
 
 module Encode = struct
-  external js : any -> any = "%identity"
   external any : 'a -> any = "%identity"
   external obj : 'a obj -> any = "%identity"
   external int : int -> any = "%identity"
@@ -107,7 +106,6 @@ module Encode = struct
 end
 
 module Decode = struct
-  external js : any -> any = "%identity"
   external any : any -> 'a = "%identity"
   external obj : any -> 'a obj = "%identity"
   external int : any -> int = "%identity"
