@@ -31,10 +31,10 @@ external typeof : any -> string = "caml_js_typeof"
 
 (** {2 Object} *)
 
-type +'cls obj constraint 'cls = [> ]
+type +'c obj constraint 'c = [> ]
 (** Typed JavaScript object values.
 
-    The type parameter ['cls] is used to differentiate between objects of
+    The type parameter ['c] is used to differentiate between objects of
     different classes using polymorphic variants. For example, the JavaScript
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date}
       Date} class can be represented as:
@@ -45,9 +45,9 @@ type +'cls obj constraint 'cls = [> ]
 
 (** {3 Super classes}
 
-    In addition to encoding the main class of an object, the type variable
-    ['cls] can represent the inherited classes, also called super classes. For
-    example, the DOM
+    In addition to encoding the main class of an object, the type variable ['c]
+    can represent the inherited classes, also called super classes. For example,
+    the DOM
     {{:https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent}
       KeyboardEvent} class can be fully represented as:
 
@@ -84,25 +84,25 @@ type +'cls obj constraint 'cls = [> ]
 
 (** {3 Object operations} *)
 
-external get : 'a obj -> string -> any = "caml_js_get"
+external get : 'c obj -> string -> any = "caml_js_get"
 (** [get obj prop] is [obj[prop]]. *)
 
-external set : 'a obj -> string -> any -> unit = "caml_js_set"
+external set : 'c obj -> string -> any -> unit = "caml_js_set"
 (** [set obj prop v] is [obj[prop] = v]. *)
 
-external del : 'a obj -> string -> unit = "caml_js_delete"
+external del : 'c obj -> string -> unit = "caml_js_delete"
 (** [del obj prop] is [delete obj[prop]]. *)
 
-external obj : (string * any) array -> 'a obj = "caml_js_object"
+external obj : (string * any) array -> 'c obj = "caml_js_object"
 (** [obj [| (prop1, v1); ... |]] is [{prop1: v1, ... }]. *)
 
-external obj_new : any -> any array -> 'a obj = "caml_js_new"
+external obj_new : any -> any array -> 'c obj = "caml_js_new"
 (** [obj_new obj args] is [new obj(...args)]. *)
 
-external meth_call : 'a obj -> string -> any array -> any = "caml_js_meth_call"
+external meth_call : 'c obj -> string -> any array -> any = "caml_js_meth_call"
 (** [meth_call obj prop args] is [obj.prop(...args)]. *)
 
-external instanceof : 'a obj -> constr:any -> bool = "caml_js_instanceof"
+external instanceof : 'c obj -> constr:any -> bool = "caml_js_instanceof"
 (** See
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof}
       instanceof}. *)
@@ -177,7 +177,7 @@ module Encode : sig
   external any : 'a -> any = "%identity"
   (** Encode any value without performing runtime conversion. *)
 
-  external obj : 'a obj -> any = "%identity"
+  external obj : 'c obj -> any = "%identity"
   (* Encode an ML representation of a JS object as a JS value. *)
 
   external int : int -> any = "%identity"
@@ -248,7 +248,7 @@ end
 
 module Decode : sig
   external any : any -> 'a = "%identity"
-  external obj : any -> 'a obj = "%identity"
+  external obj : any -> 'c obj = "%identity"
   external int : any -> int = "%identity"
   external unit : any -> unit = "%identity"
   external bool : any -> bool = "caml_js_to_bool"
@@ -269,7 +269,7 @@ end
 
 (** {2 Global} *)
 
-val global_this : 'a obj
+val global_this : 'c obj
 (** See
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis}
       globalThis}. *)
