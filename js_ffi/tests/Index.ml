@@ -53,7 +53,7 @@ end = struct
   type super = [ self | Node.super ]
   type t = self Js.obj
 
-  let t = Js.raw "Text"
+  let t = E.raw "Text"
 
   external of_any : Js.any -> [< super ] Js.obj = "%identity"
   external to_any : [> self ] Js.obj -> Js.any = "%identity"
@@ -77,7 +77,7 @@ end = struct
   type super = self
   type t = self Js.obj
 
-  let t = Js.raw "HTMLCollection"
+  let t = E.raw "HTMLCollection"
 
   external of_any : Js.any -> [< super ] Js.obj = "%identity"
   external to_any : [> self ] Js.obj -> Js.any = "%identity"
@@ -122,7 +122,7 @@ end = struct
   type super = [ self | Node.super ]
   type t = self Js.obj
 
-  let t = Js.raw "Document"
+  let t = E.raw "Document"
   let make () = Js_ffi.obj_new t [||]
 
   external super : t -> [< super ] Js.obj = "%identity"
@@ -148,14 +148,16 @@ end = struct
   let children this = Html_collection.of_any (Js.get this "children")
 end
 
-let parse_int1 str base =
-  D.int (Js.fun_call (Js.raw "parseInt") [| E.string_ascii str; E.int base |])
+let parse_int str radix =
+  D.int (D.fun' (E.raw "parseInt") [| E.string str; E.int radix |])
 
-let document = Js.raw "document" |> Document.of_any
+let alert str = D.unit (D.fun' (E.raw "window.alert") [| E.string_ascii str |])
+let document = E.raw "document" |> Document.of_any
 
 let () =
+  (* alert "HEY"; *)
   Js.debug "starting...";
-  let x1 = parse_int1 "42" 10 in
+  let x1 = parse_int "42" 10 in
   Js.debug x1;
   let body = Document.query_selector ~selectors:"body" document |> Option.get in
   let incr =

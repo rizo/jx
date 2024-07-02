@@ -82,12 +82,12 @@ module Encode = struct
   external float : float -> any = "caml_js_from_float"
   external string : string -> any = "caml_jsstring_of_string"
   external string_ascii : string -> any = "%identity"
-  external js_array : any array -> any = "caml_js_from_array"
+  external any_array : any array -> any = "caml_js_from_array"
 
-  let array encode arr = js_array (Array.map encode arr)
+  let array encode arr = any_array (Array.map encode arr)
 
-  external js_nullable : any nullable -> any = "%identity"
-  external js_undefined : any undefined -> any = "%identity"
+  external any_nullable : any nullable -> any = "%identity"
+  external any_undefined : any undefined -> any = "%identity"
 
   let option_as_nullable encode opt =
     match opt with
@@ -103,6 +103,7 @@ module Encode = struct
   let undefined encode undefined = Nullable.map encode undefined
 
   external fun' : int -> (_ -> _) -> any = "caml_js_wrap_callback_strict"
+  external raw : string -> any = "caml_pure_js_expr"
 end
 
 module Decode = struct
@@ -114,9 +115,9 @@ module Decode = struct
   external float : any -> float = "caml_js_to_float"
   external string : any -> string = "caml_string_of_jsstring"
   external string_ascii : any -> string = "%identity"
-  external js_array : any -> any array = "caml_js_to_array"
+  external any_array : any -> any array = "caml_js_to_array"
 
-  let array decode js = Array.map decode (js_array js)
+  let array decode js = Array.map decode (any_array js)
   let nullable decode js = if is_null js then null else nullable (decode js)
 
   let undefined decode js =
@@ -127,11 +128,12 @@ module Decode = struct
 
   let undefined_as_option decode js =
     if is_undefined js then None else Some (decode js)
+
+  external fun' : any -> any array -> any = "caml_js_fun_call"
 end
 
 (* fun *)
 
-external fun_call : any -> any array -> any = "caml_js_fun_call"
 external meth_call : any -> string -> any array -> any = "caml_js_meth_call"
 
 let global_this = raw "globalThis"
