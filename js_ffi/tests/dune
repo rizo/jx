@@ -1,10 +1,20 @@
+
+(library
+ (name js_lib)
+ (modules Js_lib)
+ (libraries js_ffi))
+
 (executable
-  (name index)
-  (libraries js_ffi)
-  (js_of_ocaml (flags --target-env=browser --opt=3 --pretty))
-  (modes js))
+ (name index)
+ (modules Index)
+ (libraries js_ffi js_lib)
+ (js_of_ocaml (flags --target-env=browser --opt=3 --pretty))
+ (modes js))
 
-
-(alias
- (name all)
- (deps index.html))
+(rule
+ (alias runtest)
+ (deps
+  (file index.bc.js)
+  (file index.expected.bc.js))
+ (action
+  (diff index.bc.js index.expected.bc.js)))

@@ -1,183 +1,123 @@
-module Js = Js_ffi
-module D = Js.Decode
-module E = Js.Encode
+open Js_lib
 
-module Node : sig
-  type self = [ `Node ]
-  type super = [ self | `Event_target ]
-  type t = self Js.obj
+let str_unicode_1 =
+  String.concat " " [ "Olá"; "eles"; "são"; "uma"; "ameaça!"; "👻" ]
 
-  external of_any : Js.any -> [< super ] Js.obj = "%identity"
-  external to_any : [> self ] Js.obj -> Js.any = "%identity"
+let str_ascii_1 =
+  String.concat " " [ "All"; "your"; "base"; "are"; "belong"; "to"; "us" ]
 
-  val append_child :
-    node:[> self ] Js.obj -> [> self ] Js.obj -> [< super ] Js.obj
-end = struct
-  type self = [ `Node ]
-  type super = [ self | `Event_target ]
-  type t = self Js.obj
-
-  external of_any : Js.any -> [< super ] Js.obj = "%identity"
-  external to_any : [> self ] Js.obj -> Js.any = "%identity"
-
-  let append_child ~node this =
-    of_any (Js.meth_call this "appendChild" [| to_any node |])
-end
-
-module Element : sig
-  type self = [ `Element ]
-  type super = [ self | Node.super ]
-  type t = self Js.obj
-
-  external of_any : Js.any -> [< super ] Js.obj = "%identity"
-  external to_any : [> self ] Js.obj -> Js.any = "%identity"
-end = struct
-  type self = [ `Element ]
-  type super = [ self | Node.super ]
-  type t = self Js.obj
-
-  external of_any : Js.any -> [< super ] Js.obj = "%identity"
-  external to_any : [> self ] Js.obj -> Js.any = "%identity"
-end
-
-module Text : sig
-  type self = [ `Text ]
-  type super = [ self | Node.super ]
-  type t = self Js.obj
-
-  external of_any : Js.any -> [< super ] Js.obj = "%identity"
-  external to_any : [> self ] Js.obj -> Js.any = "%identity"
-  val make : ?data:string -> unit -> [< super ] Js.obj
-end = struct
-  type self = [ `Text ]
-  type super = [ self | Node.super ]
-  type t = self Js.obj
-
-  let t = E.raw "Text"
-
-  external of_any : Js.any -> [< super ] Js.obj = "%identity"
-  external to_any : [> self ] Js.obj -> Js.any = "%identity"
-
-  let make ?data () =
-    let data = E.option_as_undefined E.string data in
-    Js.obj_new t [| data |]
-end
-
-module Html_collection : sig
-  type self = [ `Html_collection ]
-  type super = self
-  type t = self Js.obj
-
-  external of_any : Js.any -> [< super ] Js.obj = "%identity"
-  external to_any : [> self ] Js.obj -> Js.any = "%identity"
-  val length : [> self ] Js.obj -> int
-  val item : index:int -> t -> [< Element.super ] Js.obj option
-end = struct
-  type self = [ `Html_collection ]
-  type super = self
-  type t = self Js.obj
-
-  let t = E.raw "HTMLCollection"
-
-  external of_any : Js.any -> [< super ] Js.obj = "%identity"
-  external to_any : [> self ] Js.obj -> Js.any = "%identity"
-
-  let length this = D.int (Js.get this "length")
-
-  let item ~index this =
-    D.nullable_as_option Element.of_any
-      (Js_ffi.meth_call this "item" [| E.int index |])
-end
-
-module Document : sig
-  type self = [ `Document ]
-  type super = [ self | Node.super ]
-  type t = self Js.obj
-
-  external super : t -> [< super ] Js.obj = "%identity"
-  external of_any : Js.any -> [< super ] Js.obj = "%identity"
-  external to_any : [> self ] Js.obj -> Js.any = "%identity"
-  val make : unit -> [< super ] Js.obj
-
-  val create_element :
-    local_name:string ->
-    ?options:[< `String | `Element_creation_options ] Js.obj ->
-    [> self ] Js.obj ->
-    [< Element.super ] Js.obj
-
-  val create_text_node :
-    data:string -> [> self ] Js.obj -> [< Text.super ] Js.obj
-
-  val query_selector :
-    selectors:string -> [> self ] Js.obj -> [< Element.super ] Js.obj option
-
-  val append :
-    nodes:[< `Node | `Trusted_script | `String ] Js.obj array ->
-    [> self ] Js.obj ->
-    unit
-
-  val children : [> self ] Js.obj -> Html_collection.t
-end = struct
-  type self = [ `Document ]
-  type super = [ self | Node.super ]
-  type t = self Js.obj
-
-  let t = E.raw "Document"
-  let make () = Js_ffi.obj_new t [||]
-
-  external super : t -> [< super ] Js.obj = "%identity"
-  external of_any : Js.any -> [< super ] Js.obj = "%identity"
-  external to_any : [> self ] Js.obj -> Js.any = "%identity"
-
-  let create_element ~local_name ?options this =
-    let options = E.option_as_undefined E.obj options in
-    Element.of_any
-      (Js.meth_call this "createElement"
-         [| E.string_ascii local_name; options |])
-
-  let create_text_node ~data this =
-    Text.of_any (Js.meth_call this "createTextNode" [| E.string_ascii data |])
-
-  let query_selector ~selectors this =
-    D.nullable_as_option Element.of_any
-      (Js.meth_call this "querySelector" [| E.string_ascii selectors |])
-
-  let append ~nodes this =
-    D.unit (Js_ffi.meth_call this "append" [| Obj.magic nodes |])
-
-  let children this = Html_collection.of_any (Js.get this "children")
-end
-
-let parse_int str radix =
-  D.int (D.fun' (E.raw "parseInt") [| E.string str; E.int radix |])
-
-let alert str = D.unit (D.fun' (E.raw "window.alert") [| E.string_ascii str |])
-let document = E.raw "document" |> Document.of_any
-
+(* NOTE: In the examples below [str ^ ""] is used to avoid implicit optimization of literal strings. *)
 let () =
-  (* alert "HEY"; *)
-  Js.debug "starting...";
-  let x1 = parse_int "42" 10 in
-  Js.debug x1;
-  let body = Document.query_selector ~selectors:"body" document |> Option.get in
+  Jx.debug "-- Value representation --";
+  Jx.debug ();
+  Jx.debug 42;
+  (* Jx.debug (List.length [ 1; 2 ]); *)
+  (* Jx.debug 3.14; *)
+  Jx.debug 'x';
+  Jx.debug "str1";
+  Jx.debug true;
+  Jx.debug (1, 2);
+  Jx.debug [ 1; 2; 3 ];
+  Jx.debug [| 1; 2; 3 |];
+  Jx.debug None;
+  Jx.debug (Some 1);
+  Jx.debug `hello;
+
+  Jx.debug "-- Strings --";
+  let str_unicode_1' = Jx.utf16_of_utf8 str_unicode_1 in
+  let str_ascii_1' = Jx.utf16_of_utf8 str_ascii_1 in
+  Jx.debug str_ascii_1;
+  Jx.debug str_ascii_1';
+  Jx.debug str_unicode_1';
+  let dict = Jx.obj [||] in
+  Jx.set dict str_ascii_1 (Jx.int 101);
+  Jx.set dict str_unicode_1' (Jx.int 102);
+  Jx.set dict str_ascii_1' (Jx.int 103);
+  Jx.debug dict;
+
+  Jx.debug "-- Embed JavaScript --";
+  let _optimized_away = Jx.expr {|2 + 2|} in
+  Jx.debug (Jx.expr {|2 > 1 ? "static expr" : "no"|});
+  Jx.stmt "console.log('raw expr')";
+  Jx.stmt ("console.log" ^ "('raw expr 2')");
+  Jx.debug word_count;
+  Jx.debug (word_count str_ascii_1);
+
+  Jx.debug "-- Function bindings --";
+  Jx.debug (parse_int_js (Jx.ascii "42") (Jx.int 10));
+  Jx.debug (parse_int_ml ("42" ^ "") 10);
+
+  Jx.debug "Date constructor";
+  Jx.debug (Date.make_with_value ~value:(Jx.ascii "2024-04-12") ());
+  Jx.debug (Date.make_with_value ~value:(Jx.float 321321321.2) ());
+  Jx.debug (Date.make ());
+
+  let body =
+    Document.query_selector ~selectors:(Jx.ascii ("body" ^ "")) document
+    |> Jx.Nullable.unsafe_get
+  in
+
+  Jx.debug "Default arg";
+  let _ = Document.import_node ~node:(Element.to_node body) document in
+  let _ =
+    Document.import_node_with_deep ~node:(Element.to_node body)
+      ~deep:(Jx.bool true) document
+  in
+
+  (* let _2 = Document.import_node_2 ~node:body document in
+     let _2 = Document.import_node_2 ~node:body ~deep:true document in
+
+     let _3 = Document.import_node_3 ~node:body document in
+     let _3 = Document.import_node_3 ~node:body ~deep:(Jx.defined true) document in *)
+
+  (* let _ = Document.import_node' ~node:body document in *)
+
+  (* Abstract dict 1 *)
+  (* Generates an object with a single key *)
+  let ei = Event_init.empty () in
+  Event_init.set_composed ei (Jx.bool true);
+  Jx.debug ei;
+
+  (* Abstract dict 2 *)
+  (* Generates the full object with undefined entries *)
+  (* let ei = Event_init.make' ~composed:(Jx.defined true) () in
+     Jx.debug ei; *)
   let incr =
-    let elem = Document.create_element ~local_name:"button" document in
-    let incr_txt = Document.create_text_node ~data:"Incr" document in
+    let elem =
+      Element.to_node
+        (Document.create_element ~tag_name:(Jx.ascii "button") document)
+    in
+    let incr_txt =
+      Text.to_node
+        (Document.create_text_node ~data:(Jx.unicode "Incr ➕") document)
+    in
     let _ = Node.append_child ~node:incr_txt elem in
     elem
   in
   let decr =
-    let elem = Document.create_element ~local_name:"button" document in
-    let decr_txt = Text.make ~data:"Decr" () in
+    let elem =
+      Element.to_node
+        (Document.create_element_with_options
+           ~options:(Jx.ascii ("button" ^ ""))
+           ~tag_name:(Jx.ascii "button") document)
+    in
+    let decr_txt =
+      Text.to_node (Text.make_with_data ~data:(Jx.ascii "Decr") ())
+    in
     let _ = Node.append_child ~node:decr_txt elem in
     elem
   in
-  let _ = Node.append_child ~node:incr body in
-  let _ = Node.append_child ~node:decr body in
-  Js.debug (Document.children document);
+  let reset =
+    let elem =
+      Element.to_node
+        (Document.create_element ~tag_name:(Jx.ascii "button") document)
+    in
+    let reset_txt =
+      Text.to_node (Document.create_text_node ~data:(Jx.ascii "Reset") document)
+    in
+    let _ = Node.append_child ~node:reset_txt elem in
+    elem
+  in
+  Element.append ~nodes:[| incr; decr; reset |] body;
+  Jx.debug (Document.children document);
   ()
-
-module Test1 = struct
-  let decode_complex_1 (js : Js.any) =
-    D.undefined (D.array (D.nullable D.float)) js
-end

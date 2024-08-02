@@ -3,7 +3,7 @@
    "repositories": [
      {
        "url": "https://github.com/ocaml/opam-repository.git",
-       "rev": "175a8ca8b27d9a46ed86ec5d7b1130c98a153055"
+       "rev": "eceb4d83610133a48b62daa36665ce1292646561"
      }
    ],
    "packages" : {
@@ -347,11 +347,43 @@
          "ocamlfind"
        ]
      },
-     "menhir": {
-       "version": "20231231",
+     "jsonrpc": {
+       "version": "1.18.0",
        "src": {
-         "url": "https://gitlab.inria.fr/fpottier/menhir/-/archive/20231231/archive.tar.gz",
-         "sha512": "620ff3443143535e03ac98c5e8ee2ddf9ba48f8cfe441302118def1da3e03ffac7f48d4d4cb129766b625ecad0fb341da1baa0169dee8b6d07a5b0bbb735cf2f"
+         "url": "https://github.com/ocaml/ocaml-lsp/releases/download/1.18.0/lsp-1.18.0.tbz",
+         "sha256": "b59da43ccfd2ffd277c9e5f695a0e39c72c0d78e1bf2cbf2f62c1a7b7da75f03"
+       },
+       "depends": [
+         "dune",
+         "ocaml"
+       ],
+       "build-depends": [
+         "dune"
+       ]
+     },
+     "lsp": {
+       "version": "1.18.0",
+       "src": {
+         "url": "https://github.com/ocaml/ocaml-lsp/releases/download/1.18.0/lsp-1.18.0.tbz",
+         "sha256": "b59da43ccfd2ffd277c9e5f695a0e39c72c0d78e1bf2cbf2f62c1a7b7da75f03"
+       },
+       "depends": [
+         "dune",
+         "jsonrpc",
+         "ocaml",
+         "ppx_yojson_conv_lib",
+         "uutf",
+         "yojson"
+       ],
+       "build-depends": [
+         "dune"
+       ]
+     },
+     "menhir": {
+       "version": "20240715",
+       "src": {
+         "url": "https://gitlab.inria.fr/fpottier/menhir/-/archive/20240715/archive.tar.gz",
+         "sha512": "4f933cfc9026f5f2ffda9b0e626862560a233c35ecf097d179edd926d9009bdf46b6611294aea02b63c34427348568f37376a033fbe8cf98a7746fa6f1354dbd"
        },
        "depends": [
          "dune",
@@ -365,10 +397,10 @@
        ]
      },
      "menhirCST": {
-       "version": "20231231",
+       "version": "20240715",
        "src": {
-         "url": "https://gitlab.inria.fr/fpottier/menhir/-/archive/20231231/archive.tar.gz",
-         "sha512": "620ff3443143535e03ac98c5e8ee2ddf9ba48f8cfe441302118def1da3e03ffac7f48d4d4cb129766b625ecad0fb341da1baa0169dee8b6d07a5b0bbb735cf2f"
+         "url": "https://gitlab.inria.fr/fpottier/menhir/-/archive/20240715/archive.tar.gz",
+         "sha512": "4f933cfc9026f5f2ffda9b0e626862560a233c35ecf097d179edd926d9009bdf46b6611294aea02b63c34427348568f37376a033fbe8cf98a7746fa6f1354dbd"
        },
        "depends": [
          "dune",
@@ -379,10 +411,10 @@
        ]
      },
      "menhirLib": {
-       "version": "20231231",
+       "version": "20240715",
        "src": {
-         "url": "https://gitlab.inria.fr/fpottier/menhir/-/archive/20231231/archive.tar.gz",
-         "sha512": "620ff3443143535e03ac98c5e8ee2ddf9ba48f8cfe441302118def1da3e03ffac7f48d4d4cb129766b625ecad0fb341da1baa0169dee8b6d07a5b0bbb735cf2f"
+         "url": "https://gitlab.inria.fr/fpottier/menhir/-/archive/20240715/archive.tar.gz",
+         "sha512": "4f933cfc9026f5f2ffda9b0e626862560a233c35ecf097d179edd926d9009bdf46b6611294aea02b63c34427348568f37376a033fbe8cf98a7746fa6f1354dbd"
        },
        "depends": [
          "dune",
@@ -393,10 +425,10 @@
        ]
      },
      "menhirSdk": {
-       "version": "20231231",
+       "version": "20240715",
        "src": {
-         "url": "https://gitlab.inria.fr/fpottier/menhir/-/archive/20231231/archive.tar.gz",
-         "sha512": "620ff3443143535e03ac98c5e8ee2ddf9ba48f8cfe441302118def1da3e03ffac7f48d4d4cb129766b625ecad0fb341da1baa0169dee8b6d07a5b0bbb735cf2f"
+         "url": "https://gitlab.inria.fr/fpottier/menhir/-/archive/20240715/archive.tar.gz",
+         "sha512": "4f933cfc9026f5f2ffda9b0e626862560a233c35ecf097d179edd926d9009bdf46b6611294aea02b63c34427348568f37376a033fbe8cf98a7746fa6f1354dbd"
        },
        "depends": [
          "dune",
@@ -465,13 +497,14 @@
        ]
      },
      "ocaml-lsp-server": {
-       "version": "1.17.0",
+       "version": "1.18.0",
        "src": {
-         "url": "https://github.com/ocaml/ocaml-lsp/releases/download/1.17.0/lsp-1.17.0.tbz",
-         "sha256": "8fb8bbd717eefd2608b4d83458105b660e0de3a1134dc8fc216ae659d4d19600"
+         "url": "https://github.com/ocaml/ocaml-lsp/releases/download/1.18.0/lsp-1.18.0.tbz",
+         "sha256": "b59da43ccfd2ffd277c9e5f695a0e39c72c0d78e1bf2cbf2f62c1a7b7da75f03"
        },
        "depends": [
          "astring",
+         "base",
          "camlp-streams",
          "chrome-trace",
          "csexp",
@@ -480,6 +513,8 @@
          "dune-rpc",
          "dyn",
          "fiber",
+         "jsonrpc",
+         "lsp",
          "merlin-lib",
          "ocaml",
          "ocamlc-loc",
@@ -490,7 +525,6 @@
          "re",
          "spawn",
          "stdune",
-         "uutf",
          "xdg",
          "yojson"
        ],
@@ -542,10 +576,10 @@
        ]
      },
      "ocamlbuild": {
-       "version": "0.14.3",
+       "version": "0.15.0",
        "src": {
-         "url": "https://github.com/ocaml/ocamlbuild/archive/refs/tags/0.14.3.tar.gz",
-         "sha512": "def8fa1d5488905fda31f72b7f6f0ebdccefa55a8e984a6ea4a7c1e0856e8ea1f7814410202e0f7f7d5e72aca7e8ae0d6623f7f2bade78b0dd82155de76ec4e5"
+         "url": "https://github.com/ocaml/ocamlbuild/archive/refs/tags/0.15.0.tar.gz",
+         "sha512": "c8311a9a78491bf759eb27153d6ba4692d27cd935759a145f96a8ba8f3c2e97cef54e7d654ed1c2c07c74f60482a4fef5224e26d0f04450e69cdcb9418c762d3"
        },
        "depends": [
          "ocaml"
@@ -762,10 +796,10 @@
        ]
      },
      "ppxlib": {
-       "version": "0.32.1",
+       "version": "0.33.0",
        "src": {
-         "url": "https://github.com/ocaml-ppx/ppxlib/releases/download/0.32.1/ppxlib-0.32.1.tbz",
-         "sha256": "9dbad8bcb1c8b4f3df3f58bca60a5ed23d86531f0da34b4196c86bd585c09d7f"
+         "url": "https://github.com/ocaml-ppx/ppxlib/releases/download/0.33.0/ppxlib-0.33.0.tbz",
+         "sha256": "ffa44ef551f23b75e21dbd698a30310431381aaf140b9fe4b81c2e70a2d2c63a"
        },
        "depends": [
          "dune",
