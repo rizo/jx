@@ -37,7 +37,7 @@ type 'a promise = [ `Promise of 'a ] obj
 
 (** {2 Object} *)
 
-external get : 'c obj -> Stdlib.String.t -> 'v obj = "caml_js_get"
+external get : 'c obj -> Stdlib.String.t -> any = "caml_js_get"
 external set : 'c obj -> Stdlib.String.t -> 'v obj -> unit = "caml_js_set"
 external del : 'c obj -> Stdlib.String.t -> unit = "caml_js_delete"
 
@@ -48,7 +48,7 @@ external obj : (Stdlib.String.t * any) Stdlib.Array.t -> 'c obj
 external obj_new : 'c obj -> any Stdlib.Array.t -> 'a obj = "caml_js_new"
 (** [obj_new obj []] is [new obj(...args)]. *)
 
-external meth : 'c obj -> Stdlib.String.t -> any Stdlib.Array.t -> 'ret obj
+external meth : 'a obj -> Stdlib.String.t -> any Stdlib.Array.t -> any
   = "caml_js_meth_call"
 (** [meth_call obj prop args] is [obj.prop(...args)]. *)
 
@@ -96,8 +96,8 @@ external debugger : unit -> unit = "debugger"
 
 (** {2:any Any} *)
 
-external any : 'c obj -> any = "%identity"
-external any_array : 'a obj Stdlib.Array.t -> any Stdlib.Array.t = "%identity"
+(* external any : 'c obj -> any = "%identity" *)
+(* external any_array : 'a obj Stdlib.Array.t -> any Stdlib.Array.t = "%identity" *)
 
 (** {2:conv Conversion} *)
 
@@ -144,15 +144,6 @@ external array : 'a Stdlib.Array.t -> 'a array = "caml_js_from_array"
 external to_array : 'a array -> 'a Stdlib.Array.t = "caml_js_to_array"
 external list : 'a list -> 'a array = "caml_list_to_js_array"
 external to_list : 'a array -> 'a list = "caml_list_of_js_array"
-
-(** {2 Function} *)
-
-external call : function' -> any Stdlib.Array.t -> 'ret obj = "caml_js_fun_call"
-val call1 : function' -> 'a obj -> 'ret obj
-external call2 : function' -> 'a obj * 'b obj -> 'ret obj = "caml_js_fun_call"
-
-external callback : int -> (_ obj -> _) -> 'ret obj
-  = "caml_js_wrap_callback_strict"
 
 (** {2 Nullable} *)
 
@@ -280,48 +271,53 @@ external stmt : Stdlib.String.t -> unit = "caml_js_expr"
 
     Encode OCaml values to the equivalent JavaScript representation. *)
 
-(* module Encode : sig
-     external any : any -> any = "%identity"
-     external repr : 'a -> any = "%identity"
-     external obj : 'c obj -> any = "%identity"
+module Encode : sig
+  external repr : 'a -> any = "%identity"
+  external any : 'a obj -> any = "%identity"
+  external any_array : 'a obj Stdlib.Array.t -> any Stdlib.Array.t = "%identity"
+  external bool : bool -> any = "caml_js_from_bool"
+  external int : int -> any = "%identity"
+  val unit : unit -> any
+  external char : char -> any = "%identity"
+  external float : float -> any = "caml_js_from_float"
+  external unicode : Stdlib.String.t -> any = "caml_jsstring_of_string"
+  external string : Stdlib.String.t -> any = "%identity"
+  val array : ('a -> any) -> 'a Stdlib.Array.t -> any
+  external obj_array : 'a obj Stdlib.Array.t -> any = "caml_js_from_array"
+  val list : ('a -> any) -> 'a Stdlib.List.t -> any
+  external obj_list : 'a obj Stdlib.List.t -> any = "caml_list_to_js_array"
+  val nullable : ('a -> any) -> 'a option -> any
+  val undefined : ('a -> any) -> 'a option -> any
 
-     external dict : (Stdlib.String.t * any) Stdlib.Array.t -> 'c obj
-       = "caml_js_object"
+  external obj : (Stdlib.String.t * any) Stdlib.Array.t -> 'a obj
+    = "caml_js_object"
 
-     external int : int -> any = "%identity"
-     external char : char -> any = "%identity"
-     external unit : unit -> any = "%identity"
-     external bool : bool -> any = "caml_js_from_bool"
-     external float : float -> any = "caml_js_from_float"
-     external string : string -> any = "caml_jsstring_of_string"
-     external string_ascii : string -> any = "%identity"
-     external any_array : any Stdlib.Array.t -> any = "caml_js_from_array"
-     external fun' : int -> (any -> _) -> any = "caml_js_wrap_callback_strict"
-     val nullable : ('a -> any) -> 'a nullable -> any
-     val undefined : ('a -> any) -> 'a undefined -> any
-     val option_as_nullable : ('a -> any) -> 'a option -> any
-     val option_as_undefined : ('a -> any) -> 'a option -> any
-   end *)
+  val dict : ('a -> any) -> (Stdlib.String.t * 'a) Stdlib.Array.t -> any
+  external func : int -> (_ -> _) -> any = "caml_js_wrap_callback_strict"
+end
 
 (* {3:decode Decode}
 
     Decode OCaml values from the equivalent JavaScript representation. *)
 
-(* module Decode : sig
-     external any : any -> any = "%identity"
-     external repr : any -> 'a = "%identity"
-     external obj : any -> 'c obj = "%identity"
-     external int : any -> int = "%identity"
-     external unit : any -> unit = "%identity"
-     external bool : any -> bool = "caml_js_to_bool"
-     external float : any -> float = "caml_js_to_float"
-     external string : any -> string = "caml_string_of_jsstring"
-     external string_ascii : any -> string = "%identity"
-     external any_array : any -> any array = "caml_js_to_array"
-     val nullable : (any -> 'a) -> any -> 'a nullable
-     val undefined : (any -> 'a) -> any -> 'a undefined
-     external any_nullable : any -> any nullable = "%identity"
-     external obj_nullable : any -> 'c obj nullable = "%identity"
-     val nullable_as_option : (any -> 'a) -> any -> 'a option
-     val undefined_as_option : (any -> 'a) -> any -> 'a option
-   end *)
+module Decode : sig
+  external any : any -> 'a obj = "%identity"
+  external int : any -> int = "%identity"
+  val unit : any -> unit
+  external bool : any -> bool = "caml_js_to_bool"
+  external float : any -> float = "caml_js_to_float"
+  external unicode : any -> Stdlib.String.t = "caml_string_of_jsstring"
+  external string : any -> Stdlib.String.t = "%identity"
+  val array : (any -> 'a) -> any -> 'a Stdlib.Array.t
+  external obj_array : any -> 'a obj Stdlib.Array.t = "caml_js_to_array"
+  external any_array : any -> any Stdlib.Array.t = "caml_js_to_array"
+  val list : (any -> 'a) -> any -> 'a Stdlib.List.t
+  external any_list : any -> any Stdlib.List.t = "caml_list_of_js_array"
+  val nullable : (any -> 'a) -> any -> 'a option
+  val undefined : (any -> 'a) -> any -> 'a option
+  external func : any -> any Stdlib.Array.t -> any = "caml_js_fun_call"
+
+  (* val obj : any -> (string * any) Stdlib.Array.t *)
+
+  (* val dict : (any -> 'v) -> any -> (string * 'v) Stdlib.Array.t *)
+end

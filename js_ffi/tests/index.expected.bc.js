@@ -864,6 +864,10 @@
     globalThis.caml_fs_tmp = [];
     return 0;
    }
+   function caml_js_expr(s){
+    console.error("caml_js_expr: fallback to runtime evaluation\n");
+    return eval(caml_jsstring_of_string(s));
+   }
    var caml_ml_channels = new Array();
    function caml_ml_channel_get(id){return caml_ml_channels[id];}
    function caml_ml_flush(chanid){
@@ -1303,6 +1307,7 @@
    debug("-- Embed JavaScript --");
    debug(2 > 1 ? "static expr" : "no");
    console.log("raw expr");
+   caml_js_expr("console.log" + "('raw expr 2')");
    debug(word_count);
    debug(word_count(str_ascii_1));
    debug("-- Function bindings --");
@@ -1313,21 +1318,20 @@
    debug(new t("2024-04-12"));
    debug(new t(321321321.2));
    debug(new t);
-   var selectors = "body" + cst, this$2 = document$0.querySelector(selectors);
+   var this$2 = document$0.querySelector("body");
    debug("Default arg");
    document$0.importNode(this$2);
    var deep = ! ! 1;
    document$0.importNode(this$2, deep);
-   var this$0 = {}, composed = ! ! 1;
-   this$0["composed"] = composed;
+   var this$0 = {};
+   this$0["composed"] = ! ! 1;
    debug(this$0);
    var
     this$1 = document$0.createElement(cst_button),
     incr_txt = document$0.createTextNode("Incr ➕");
    this$1.appendChild(incr_txt);
    var
-    options = cst_button + cst,
-    decr = document$0.createElement(cst_button, options),
+    decr = document$0.createElement(cst_button, cst_button),
     decr_txt = new t$0("Decr");
    decr.appendChild(decr_txt);
    var

@@ -64,7 +64,7 @@ external instanceof : 'c obj -> constr:'constr obj -> bool
 
 (* Object *)
 
-external get : 'c obj -> Stdlib.String.t -> 'v obj = "caml_js_get"
+external get : 'c obj -> Stdlib.String.t -> any = "caml_js_get"
 external set : 'c obj -> Stdlib.String.t -> 'v obj -> unit = "caml_js_set"
 external del : 'c obj -> Stdlib.String.t -> unit = "caml_js_delete"
 
@@ -80,17 +80,6 @@ external meth : 'c obj -> Stdlib.String.t -> any Stdlib.Array.t -> 'ret obj
 
 external equal : 'c obj -> 'c obj -> bool = "caml_js_equals"
 external strict_equal : 'c obj -> 'c obj -> bool = "caml_js_strict_equals"
-
-(* Function *)
-
-external call : function' -> any Stdlib.Array.t -> 'ret obj = "caml_js_fun_call"
-
-let call1 f_obj a = call f_obj [| any a |]
-
-external call2 : function' -> 'a obj * 'b obj -> 'ret obj = "caml_js_fun_call"
-
-external callback : int -> (_ obj -> _) -> 'ret obj
-  = "caml_js_wrap_callback_strict"
 
 (* debug *)
 
@@ -182,62 +171,70 @@ end
 (* Encode *)
 
 module Encode = struct
-  external any : any -> any = "%identity"
   external repr : 'a -> any = "%identity"
-  external obj : 'c obj -> any = "%identity"
-
-  external dict : (Stdlib.String.t * any) Stdlib.Array.t -> 'c obj
-    = "caml_js_object"
-
+  external any : 'a obj -> any = "%identity"
+  external any_array : 'a obj Stdlib.Array.t -> any Stdlib.Array.t = "%identity"
+  external bool : bool -> any = "caml_js_from_bool"
   external int : int -> any = "%identity"
   external char : char -> any = "%identity"
-  external unit : unit -> any = "%identity"
-  external bool : bool -> any = "caml_js_from_bool"
-  external float : float -> any = "caml_js_from_float"
-  external string : string -> any = "caml_jsstring_of_string"
-  external string_ascii : string -> any = "%identity"
-  external any_array : any Stdlib.Array.t -> any = "caml_js_from_array"
-  external fun' : int -> (any -> _) -> any = "caml_js_wrap_callback_strict"
 
-  let option_as_nullable encode opt =
+  let unit () = undefined
+
+  external float : float -> any = "caml_js_from_float"
+  external unicode : Stdlib.String.t -> any = "caml_jsstring_of_string"
+  external string : Stdlib.String.t -> any = "%identity"
+
+  external obj : (Stdlib.String.t * any) Stdlib.Array.t -> 'a obj
+    = "caml_js_object"
+
+  let dict ml_to_any fields =
+    obj (Stdlib.Array.map (fun (prop, v) -> (prop, ml_to_any v)) fields)
+
+  external obj_array : 'a obj Stdlib.Array.t -> any = "caml_js_from_array"
+
+  let array ml_to_any ml_arr = obj_array (Array.map ml_to_any ml_arr)
+
+  external obj_list : any Stdlib.List.t -> any = "caml_list_to_js_array"
+
+  let list ml_to_any ml_lst = obj_list (List.map ml_to_any ml_lst)
+
+  external func : int -> (_ -> _) -> any = "caml_js_wrap_callback_strict"
+
+  let nullable encode opt =
     match opt with
     | None -> null
     | Some x -> encode x
 
-  let option_as_undefined encode opt =
+  let undefined encode opt =
     match opt with
     | None -> undefined
     | Some x -> encode x
 
-  let nullable encode nullable = Nullable.map encode nullable
-  let undefined encode undefined = Nullable.map encode undefined
+  (* let field obj prop ml_to_any ml_val = set obj prop (ml_to_any ml_val) *)
 end
 
 module Decode = struct
-  external any : any -> any = "%identity"
-  external repr : any -> 'a = "%identity"
-  external obj : any -> 'a obj = "%identity"
+  external any : any -> 'a obj = "%identity"
   external int : any -> int = "%identity"
-  external unit : any -> unit = "%identity"
+
+  let unit = ignore
+
   external bool : any -> bool = "caml_js_to_bool"
   external float : any -> float = "caml_js_to_float"
-  external string : any -> string = "caml_string_of_jsstring"
-  external string_ascii : any -> string = "%identity"
-  external any_array : any -> any array = "caml_js_to_array"
+  external unicode : any -> Stdlib.String.t = "caml_string_of_jsstring"
+  external string : any -> Stdlib.String.t = "%identity"
+  external obj_array : any -> 'a obj Stdlib.Array.t = "caml_js_to_array"
+  external any_array : any -> any Stdlib.Array.t = "caml_js_to_array"
+  external any_list : any -> any Stdlib.List.t = "caml_list_of_js_array"
 
-  let nullable decode js = if is_null js then null else nullable (decode js)
+  let array any_to_ml any = Stdlib.Array.map any_to_ml (any_array any)
+  let list any_to_ml any = Stdlib.List.map any_to_ml (any_list any)
+  let nullable decode js = if is_null js then None else Some (decode js)
+  let undefined decode js = if is_undefined js then None else Some (decode js)
 
-  let undefined decode js =
-    if is_null js then undefined else defined (decode js)
+  external func : any -> any Stdlib.Array.t -> any = "caml_js_fun_call"
 
-  external any_nullable : any -> any nullable = "%identity"
-  external obj_nullable : any -> 'c obj nullable = "%identity"
-
-  let nullable_as_option decode js =
-    if is_null js then None else Some (decode js)
-
-  let undefined_as_option decode js =
-    if is_undefined js then None else Some (decode js)
+  (* let field obj prop any_to_ml = any_to_ml (get obj prop) *)
 end
 
 (* global *)

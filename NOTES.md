@@ -12,3 +12,4 @@
 This means that:
 - The low-level API of the bindings closely follows JavaScript/DOM conventions.
 - The low-level APi of the bindings might be more verbose.
+- Recursive modules generate `update_module` calls and seem to have a runtime overhead.

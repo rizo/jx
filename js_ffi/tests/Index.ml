@@ -53,15 +53,14 @@ let () =
   Jx.debug (Date.make ());
 
   let body =
-    Document.query_selector ~selectors:(Jx.ascii ("body" ^ "")) document
-    |> Jx.Nullable.unsafe_get
+    Document.query_selector ~selectors:"body" document |> Jx.Nullable.unsafe_get
   in
 
   Jx.debug "Default arg";
   let _ = Document.import_node ~node:(Element.to_node body) document in
   let _ =
-    Document.import_node_with_deep ~node:(Element.to_node body)
-      ~deep:(Jx.bool true) document
+    Document.import_node_with_deep ~node:(Element.to_node body) ~deep:true
+      document
   in
 
   (* let _2 = Document.import_node_2 ~node:body document in
@@ -75,7 +74,7 @@ let () =
   (* Abstract dict 1 *)
   (* Generates an object with a single key *)
   let ei = Event_init.empty () in
-  Event_init.set_composed ei (Jx.bool true);
+  Event_init.set_composed ei true;
   Jx.debug ei;
 
   (* Abstract dict 2 *)
@@ -84,12 +83,11 @@ let () =
      Jx.debug ei; *)
   let incr =
     let elem =
-      Element.to_node
-        (Document.create_element ~tag_name:(Jx.ascii "button") document)
+      Element.to_node (Document.create_element ~tag_name:"button" document)
     in
     let incr_txt =
       Text.to_node
-        (Document.create_text_node ~data:(Jx.unicode "Incr ➕") document)
+        (Document.create_text_node ~data:(Jx.utf16_of_utf8 "Incr ➕") document)
     in
     let _ = Node.append_child ~node:incr_txt elem in
     elem
@@ -97,9 +95,8 @@ let () =
   let decr =
     let elem =
       Element.to_node
-        (Document.create_element_with_options
-           ~options:(Jx.ascii ("button" ^ ""))
-           ~tag_name:(Jx.ascii "button") document)
+        (Document.create_element_with_options ~options:(Jx.ascii "button")
+           ~tag_name:"button" document)
     in
     let decr_txt =
       Text.to_node (Text.make_with_data ~data:(Jx.ascii "Decr") ())
@@ -109,11 +106,10 @@ let () =
   in
   let reset =
     let elem =
-      Element.to_node
-        (Document.create_element ~tag_name:(Jx.ascii "button") document)
+      Element.to_node (Document.create_element ~tag_name:"button" document)
     in
     let reset_txt =
-      Text.to_node (Document.create_text_node ~data:(Jx.ascii "Reset") document)
+      Text.to_node (Document.create_text_node ~data:"Reset" document)
     in
     let _ = Node.append_child ~node:reset_txt elem in
     elem
