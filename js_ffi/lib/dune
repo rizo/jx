@@ -1,6 +1,0 @@
-(library
-  (name js_ffi)
-  (public_name js_ffi)
-  (modules Js_ffi)
-  (modes byte)
-  (libraries js_of_ocaml-compiler.runtime))

@@ -13,4 +13,4 @@ watch:
 
 .PHONY: promote
 promote:
-	cat _build/default/js_ffi/tests/index.bc.js > js_ffi/tests/index.expected.bc.js
+	cat _build/default/jx/tests/index.bc.js > jx/tests/index.expected.bc.js

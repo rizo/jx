@@ -1,8 +1,7 @@
-module Jx = Js_ffi
-module E = Js_ffi.Encode
-module D = Js_ffi.Decode
+module E = Jx.Encode
+module D = Jx.Decode
 
-type date = [ `Date ] Js_ffi.obj
+type date = [ `Date ] Jx.obj
 and event_init = [ `Event_init ] Jx.obj
 and dom_high_res_time_stamp = float
 and event_listener = event -> unit
@@ -10,47 +9,50 @@ and event = [ `Event ] Jx.obj
 and event_target = [ `Event_target ] Jx.obj
 
 external event_target_of_any : Jx.any -> event_target = "%identity"
-external any_of_event_target : Jx.any -> event_target = "%identity"
+external event_target_to_any : Jx.any -> event_target = "%identity"
+
+external dom_high_res_time_stamp_of_any : Jx.any -> dom_high_res_time_stamp
+  = "caml_js_to_float"
+
+external dom_high_res_time_stamp_to_any : dom_high_res_time_stamp -> Jx.any
+  = "caml_js_from_float"
 
 module Date : sig
-  type t = [ `Date ] Js_ffi.obj
+  type t = [ `Date ] Jx.obj
 
   external of_any : Jx.any -> t = "%identity"
   external to_any : t -> Jx.any = "%identity"
   val make : unit -> t
-
-  val make_with_value :
-    value:[< `Number | `String | `Date ] Js_ffi.obj -> unit -> t
-
+  val make_with_value : value:[< `Number | `String | `Date ] Jx.obj -> unit -> t
   val now : unit -> t
   val parse : string:string -> unit -> t
   val get_date : t -> int
   val set_date : date:int -> t -> int
 end = struct
-  type t = [ `Date ] Js_ffi.obj
+  type t = [ `Date ] Jx.obj
 
   let t = Jx.expr "Date"
 
   external of_any : Jx.any -> t = "%identity"
   external to_any : t -> Jx.any = "%identity"
 
-  let make () = Js_ffi.obj_new t [||]
+  let make () = Jx.obj_new t [||]
 
   let make_with_value ~value () =
     let value = E.any value in
-    Js_ffi.obj_new t [| value |]
+    Jx.obj_new t [| value |]
 
-  let now () = of_any (Jx.meth t "now" [||])
+  let now () = of_any (D.meth t "now" [||])
 
   let parse ~string () =
     let string = E.string string in
-    of_any (Jx.meth t "parse" [| string |])
+    of_any (D.meth t "parse" [| string |])
 
-  let get_date this = D.int (Jx.meth this "getDate" [||])
+  let get_date this = D.int (D.meth this "getDate" [||])
 
   let set_date ~date this =
     let date = E.int date in
-    D.int (Jx.meth this "setDate" [| date |])
+    D.int (D.meth this "setDate" [| date |])
 end
 
 module Event_init : sig
@@ -72,15 +74,15 @@ end = struct
   external to_any : t -> Jx.any = "%identity"
 
   let empty () = Jx.obj [||]
-  let set_bubbles this bubbles = Jx.set this "bubbles" (E.bool bubbles)
+  let set_bubbles this bubbles = E.field this "bubbles" E.bool bubbles
 
   let set_cancelable this cancelable =
-    Jx.set this "cancelable" (E.bool cancelable)
+    E.field this "cancelable" E.bool cancelable
 
-  let set_composed this composed = Jx.set this "composed" (E.bool composed)
-  let bubbles this = D.bool (Jx.get this "bubbles")
-  let cancelable this = D.bool (Jx.get this "cancelable")
-  let composed this = D.bool (Jx.get this "composed")
+  let set_composed this composed = E.field this "composed" E.bool composed
+  let bubbles this = D.field this "bubbles" D.bool
+  let cancelable this = D.field this "cancelable" D.bool
+  let composed this = D.field this "composed" D.bool
 end
 
 module Dom_high_res_time_stamp : sig
@@ -150,54 +152,47 @@ end = struct
     let event_init_dict = Event_init.to_any event_init_dict in
     Jx.obj_new t [| type'; event_init_dict |]
 
-  let type' this = D.string (Jx.get this "type")
-
-  let target this =
-    Jx.Nullable.of_any event_target_of_any (Jx.get this "target")
-
-  let src_element this =
-    Jx.Nullable.of_any event_target_of_any (Jx.get this "srcElement")
-
-  let current_target this =
-    Jx.Nullable.of_any event_target_of_any (Jx.get this "currentTarget")
-
-  let composed_path this = D.any (Jx.get this "composedPath")
+  let type' this = D.field this "type" D.string
+  let target this = D.field this "target" D.obj
+  let src_element this = D.field this "srcElement" D.obj
+  let current_target this = D.field this "currentTarget" D.obj
+  let composed_path this = D.field this "composedPath" D.obj
   let none = Jx.int 0
   let capturing_phase = Jx.int 1
   let at_target = Jx.int 2
   let bubbling_phase = Jx.int 3
-  let event_phase this = D.int (Jx.get this "eventPhase")
-  let stop_propagation this = D.unit (Jx.meth this "stopPropagation" [||])
-  let cancel_bubble this = D.bool (Jx.get this "cancelBubble")
-  let set_cancel_bubble this x = Jx.set this "cancelBubble" (E.bool x)
+  let event_phase this = D.field this "eventPhase" D.int
+  let stop_propagation this = D.unit (D.meth this "stopPropagation" [||])
+  let cancel_bubble this = D.field this "cancelBubble" D.bool
+  let set_cancel_bubble this x = E.field this "cancelBubble" E.bool x
 
   let stop_immediate_propagation this =
-    D.unit (Jx.meth this "stopImmediatePropagation" [||])
+    D.unit (D.meth this "stopImmediatePropagation" [||])
 
-  let bubbles this = D.bool (Jx.get this "bubbles")
-  let cancelable this = D.bool (Jx.get this "cancelable")
-  let return_value this = D.bool (Jx.get this "returnValue")
-  let set_return_value this x = Jx.set this "returnValue" (E.bool x)
-  let prevent_default this = D.unit (Jx.meth this "preventDefault" [||])
-  let default_prevented this = D.bool (Jx.get this "defaultPrevented")
-  let composed this = D.bool (Jx.get this "composed")
-  let is_trusted this = D.bool (Jx.get this "isTrusted")
-  let time_stamp this = Dom_high_res_time_stamp.of_any (Jx.get this "timeStamp")
+  let bubbles this = D.field this "bubbles" D.bool
+  let cancelable this = D.field this "cancelable" D.bool
+  let return_value this = D.field this "returnValue" D.bool
+  let set_return_value this x = E.field this "returnValue" E.bool x
+  let prevent_default this = D.unit (D.meth this "preventDefault" [||])
+  let default_prevented this = D.field this "defaultPrevented" D.bool
+  let composed this = D.field this "composed" D.bool
+  let is_trusted this = D.field this "isTrusted" D.bool
+  let time_stamp this = D.field this "timeStamp" dom_high_res_time_stamp_of_any
 
   let init_event ~type' this =
     let type' = E.string type' in
-    D.unit (Jx.meth this "initEvent" [| type' |])
+    D.unit (D.meth this "initEvent" [| type' |])
 
   let init_event_with_bubbles ~type' ~bubbles this =
     let type' = E.string type' in
     let bubbles = E.bool bubbles in
-    D.unit (Jx.meth this "initEvent" [| type'; bubbles |])
+    D.unit (D.meth this "initEvent" [| type'; bubbles |])
 
   let init_event_with_bubbles_and_cancelable ~type' ~bubbles ~cancelable this =
     let type' = E.string type' in
     let bubbles = E.bool bubbles in
     let cancelable = E.bool cancelable in
-    D.unit (Jx.meth this "initEvent" [| type'; bubbles; cancelable |])
+    D.unit (D.meth this "initEvent" [| type'; bubbles; cancelable |])
 end
 
 module Event_listener : sig
@@ -256,28 +251,28 @@ end = struct
   let add_event_listener ~type' ~callback this =
     let type' = E.string type' in
     let callback = Jx.Nullable.to_any Event_listener.to_any callback in
-    D.unit (Jx.meth this "addEventListener" [| type'; callback |])
+    D.unit (D.meth this "addEventListener" [| type'; callback |])
 
   let add_event_listener_with_options ~type' ~callback ~options this =
     let type' = E.string type' in
     let callback = Jx.Nullable.to_any Event_listener.to_any callback in
     let options = E.any options in
-    D.unit (Jx.meth this "addEventListener" [| type'; callback; options |])
+    D.unit (D.meth this "addEventListener" [| type'; callback; options |])
 
   let remove_event_listener ~type' ~callback this =
     let type' = E.string type' in
     let callback = Jx.Nullable.to_any Event_listener.to_any callback in
-    D.unit (Jx.meth this "removeEventListener" [| type'; callback |])
+    D.unit (D.meth this "removeEventListener" [| type'; callback |])
 
   let remove_event_listener_with_options ~type' ~callback ~options this =
     let type' = E.string type' in
     let callback = Jx.Nullable.to_any Event_listener.to_any callback in
     let options = E.any options in
-    D.unit (Jx.meth this "removeEventListener" [| type'; callback; options |])
+    D.unit (D.meth this "removeEventListener" [| type'; callback; options |])
 
   let dispatch_event ~event this =
     let event = Event.to_any event in
-    D.bool (Jx.meth this "dispatchEvent" [| event |])
+    D.bool (D.meth this "dispatchEvent" [| event |])
 end
 
 module Node : sig
@@ -293,7 +288,7 @@ end = struct
   external to_any : t -> Jx.any = "%identity"
 
   let append_child ~node this =
-    of_any (Jx.meth this "appendChild" [| to_any node |])
+    of_any (D.meth this "appendChild" [| to_any node |])
 end
 
 module Element : sig
@@ -312,7 +307,7 @@ end = struct
   external of_any : Jx.any -> t = "%identity"
   external to_any : t -> Jx.any = "%identity"
 
-  let append ~nodes this = D.unit (Jx.meth this "append" (E.any_array nodes))
+  let append ~nodes this = D.unit (D.meth this "append" (E.Array.obj nodes))
 end
 
 module Text : sig
@@ -322,7 +317,7 @@ module Text : sig
   external of_any : Jx.any -> t = "%identity"
   external to_any : t -> Jx.any = "%identity"
   val make : unit -> t
-  val make_with_data : data:Jx.string -> unit -> t
+  val make_with_data : data:Jx.String.t -> unit -> t
 end = struct
   type t = [ `Text ] Jx.obj
 
@@ -354,11 +349,11 @@ end = struct
   external of_any : Jx.any -> t = "%identity"
   external to_any : t -> Jx.any = "%identity"
 
-  let length this = D.int (Jx.get this "length")
+  let length this = D.field this "length" D.int
 
   let item ~index this =
     let index = E.int index in
-    D.any (Jx.meth this "item" [| index |])
+    D.obj (D.meth this "item" [| index |])
 end
 
 module Document : sig
@@ -385,7 +380,7 @@ end = struct
   type t = [ `Document ] Jx.obj
 
   let t = Jx.expr "Document"
-  let make () = Js_ffi.obj_new t [||]
+  let make () = Jx.obj_new t [||]
 
   external to_node : t -> Node.t = "%identity"
   external of_any : Jx.any -> t = "%identity"
@@ -393,35 +388,35 @@ end = struct
 
   let create_element ~tag_name this =
     let tag_name = E.string tag_name in
-    Element.of_any (Jx.meth this "createElement" [| tag_name |])
+    Element.of_any (D.meth this "createElement" [| tag_name |])
 
   let create_element_with_options ~tag_name ~options this =
     let tag_name = E.string tag_name in
     let options = E.any options in
-    Element.of_any (Jx.meth this "createElement" [| tag_name; options |])
+    Element.of_any (D.meth this "createElement" [| tag_name; options |])
 
   let create_text_node ~data this =
-    Text.of_any (Jx.meth this "createTextNode" [| E.string data |])
+    Text.of_any (D.meth this "createTextNode" [| E.string data |])
 
   let query_selector ~selectors this =
-    D.any (Jx.meth this "querySelector" [| E.string selectors |])
+    D.obj (D.meth this "querySelector" [| E.string selectors |])
 
-  let children this = Html_collection.of_any (Jx.get this "children")
+  let children this = D.field this "children" D.obj
 
   let import_node ~node this =
     let node = Node.to_any node in
-    Node.of_any (Jx.meth this "importNode" [| node |])
+    Node.of_any (D.meth this "importNode" [| node |])
 
   let import_node_with_deep ~node ~deep this =
     let node = Node.to_any node in
     let deep = E.bool deep in
-    Node.of_any (Jx.meth this "importNode" [| node; deep |])
+    Node.of_any (D.meth this "importNode" [| node; deep |])
 end
 
-let window : [ `Window ] Jx.obj = D.any (Jx.get Jx.global "window")
+let window : [ `Window ] Jx.obj = D.field Jx.global "window" D.obj
 
-let parse_int_js (str : Jx.string) (radix : Jx.number) : Jx.number =
-  D.any (D.func (Jx.expr "parseInt") [| E.any str; E.any radix |])
+let parse_int_js (str : Jx.String.t) (radix : Jx.number) : Jx.number =
+  D.obj (D.func (Jx.expr "parseInt") [| E.any str; E.any radix |])
 
 let parse_int_ml (str : string) (radix : int) : int =
   D.int (D.func (Jx.expr "parseInt") [| E.string str; E.int radix |])

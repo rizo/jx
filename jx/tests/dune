@@ -2,18 +2,19 @@
 (library
  (name js_lib)
  (modules Js_lib)
- (libraries js_ffi))
+ (libraries jx))
 
 (executable
  (name index)
  (modules Index)
- (libraries js_ffi js_lib)
+ (libraries jx js_lib)
  (js_of_ocaml (flags --target-env=browser --opt=3 --pretty))
  (modes js))
 
 (rule
  (alias runtest)
  (deps
+  (file index.html)
   (file index.bc.js)
   (file index.expected.bc.js))
  (action

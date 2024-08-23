@@ -1254,7 +1254,7 @@
     }
    }
    var global = globalThis;
-   function debug(x){console.debug(x); return;}
+   function log(x){console.log(x); return;}
    var t = Date, t$0 = Text;
    global["window"];
    var document$0 = document;
@@ -1280,52 +1280,57 @@
          [0,
           "your",
           [0, "base", [0, "are", [0, "belong", [0, "to", [0, "us", 0]]]]]]]);
-   debug("-- Value representation --");
-   debug(0);
-   debug(42);
-   debug(120);
-   debug("str1");
-   debug(1);
-   debug([0, 1, 2]);
-   debug([0, 1, [0, 2, [0, 3, 0]]]);
-   debug([0, 1, 2, 3]);
-   debug(0);
-   debug([0, 1]);
-   debug(616641298);
-   debug("-- Strings --");
+   log("-- Value representation --");
+   log(0);
+   log(42);
+   log(120);
+   log("str1");
+   log(1);
+   log([0, 1, 2]);
+   log([0, 1, [0, 2, [0, 3, 0]]]);
+   log([0, 1, 2, 3]);
+   log(0);
+   log([0, 1]);
+   log(616641298);
+   log("-- Strings --");
+   log("Olá, OCaml! 🐫");
+   log
+    (caml_jsstring_of_string
+      ("\xd0\x9f\xd1\x80\xd0\xb8\xd0\xb2\xd1\x96\xd1\x82 \xd0\xb7\xd0\xbd\xd0\xbe\xd0\xb2\xd1\x83!"
+       + " \xf0\x9f\x90\xab"));
    var
     str_unicode_1$0 = caml_jsstring_of_string(str_unicode_1),
     str_ascii_1$0 = caml_jsstring_of_string(str_ascii_1);
-   debug(str_ascii_1);
-   debug(str_ascii_1$0);
-   debug(str_unicode_1$0);
+   log(str_ascii_1);
+   log(str_ascii_1$0);
+   log(str_unicode_1$0);
    var dict = {};
    dict[str_ascii_1] = 101;
    dict[str_unicode_1$0] = 102;
    dict[str_ascii_1$0] = 103;
-   debug(dict);
-   debug("-- Embed JavaScript --");
-   debug(2 > 1 ? "static expr" : "no");
+   log(dict);
+   log("-- Embed JavaScript --");
+   log(2 > 1 ? "static expr" : "no");
    console.log("raw expr");
    caml_js_expr("console.log" + "('raw expr 2')");
-   debug(word_count);
-   debug(word_count(str_ascii_1));
-   debug("-- Function bindings --");
-   debug(parseInt(cst_42, 10));
+   log(word_count);
+   log(word_count(str_ascii_1));
+   log("-- Function bindings --");
+   log(parseInt(cst_42, 10));
    var str = cst_42 + cst;
-   debug(parseInt(str, 10));
-   debug("Date constructor");
-   debug(new t("2024-04-12"));
-   debug(new t(321321321.2));
-   debug(new t);
+   log(parseInt(str, 10));
+   log("Date constructor");
+   log(new t("2024-04-12"));
+   log(new t(321321321.2));
+   log(new t);
    var this$2 = document$0.querySelector("body");
-   debug("Default arg");
+   log("Default arg");
    document$0.importNode(this$2);
    var deep = ! ! 1;
    document$0.importNode(this$2, deep);
    var this$0 = {};
    this$0["composed"] = ! ! 1;
-   debug(this$0);
+   log(this$0);
    var
     this$1 = document$0.createElement(cst_button),
     incr_txt = document$0.createTextNode("Incr ➕");
@@ -1339,7 +1344,7 @@
     reset_txt = document$0.createTextNode("Reset");
    reset.appendChild(reset_txt);
    this$2.append(this$1, decr, reset);
-   debug(document$0["children"]);
+   log(document$0["children"]);
    do_at_exit(undef);
    return;
   }
