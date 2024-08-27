@@ -1,9 +1,43 @@
 (** External JavaScript language interface for OCaml.
 
-    This module provides types and functions to allow compile-time and runtime
-    interoperability between JavaScript and OCaml. *)
+    This module provides definitions and external primitives that facilitate
+    type-safe compile-time and runtime interoperability between JavaScript and
+    OCaml using the {{:https://github.com/ocsigen/js_of_ocaml} js_of_ocaml}
+    compiler.
 
-(** {2 Types}
+    {b Example:}
+
+    The following example provides bindings for the
+    {{:https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById}
+      getElementById} method of the global
+    {{:https://developer.mozilla.org/en-US/docs/Web/API/Document} document}
+    object.
+
+    {[
+      module E = Jx.Encode
+      module D = Jx.Decode
+
+      (* Bind the global document object. *)
+      let document : [ `Document ] Jx.obj = Jx.expr "document"
+
+      (* Bind the getElementById method call. *)
+      let get_element_by_id id : [ `Element ] Jx.obj =
+        D.obj (D.meth document "getElementById" [| E.string id |])
+
+      let () = Jx.log (get_element_by_id "container")
+    ]}
+
+    Which generates the following code (in addition to the OCaml runtime):
+
+    {@javascript[
+      log (document.getElementById "container")
+    ]}
+
+    In this example, the {!module:Decode} and {!module:Encode} modules are used
+    to encode the method arguments and decode the return object. Type
+    annotations are used to constrain the {{!type:obj} object class}. *)
+
+(** {1 Types}
 
     All standard JavaScript types are directly representable in OCaml without
     wrapping or any runtime conversions. This is achieved by providing
@@ -15,7 +49,7 @@
     can write {!section:bindings} that convert OCaml values to JavaScript and
     vice-versa. *)
 
-(** {3:object Object} *)
+(** {2:object Object} *)
 
 type +'c obj constraint 'c = [> ]
 (** Typed JavaScript objects.
@@ -43,7 +77,7 @@ type prop = string
     {e Note:} Properties names with non-ASCII characters require transcoding
     (see {!section:unicode}). *)
 
-external get : 'c obj -> prop -> any = "caml_js_get"
+external get : 'c obj -> prop -> 'v obj = "caml_js_get"
 external set : 'c obj -> prop -> 'v obj -> unit = "caml_js_set"
 external del : 'c obj -> prop -> unit = "caml_js_delete"
 
@@ -81,7 +115,7 @@ module Object : sig
   type 'a t = 'a obj
 end
 
-(** {3 Dict} *)
+(** {2 Dict} *)
 
 type +'a dict = [ `Dict of 'a ] obj
 (** The type for JavaScript objects that act as containers for values of the
@@ -98,7 +132,7 @@ module Dict : sig
   (** An object with homogeneous value types. *)
 end
 
-(** {3 Nullable}
+(** {2 Nullable}
 
     Type-safe encoding of JavaScript values that can be null. *)
 
@@ -137,7 +171,7 @@ module Nullable : sig
       ]} *)
 end
 
-(** {3 Undefined}
+(** {2 Undefined}
 
     Type-safe encoding of JavaScript values that can be undefined. *)
 
@@ -171,7 +205,7 @@ module Undefined : sig
       ]} *)
 end
 
-(** {3 Boolean} *)
+(** {2 Boolean} *)
 
 type boolean = [ `Boolean ] obj
 
@@ -190,7 +224,7 @@ module Boolean : sig
   external to_bool : t -> Stdlib.Bool.t = "caml_js_to_bool"
 end
 
-(** {3 Number} *)
+(** {2 Number} *)
 
 type number = [ `Number ] obj
 (** The JavaScript
@@ -225,7 +259,7 @@ module Number : sig
   external to_nativeint : t -> nativeint = "caml_js_to_nativeint"
 end
 
-(** {3 String} *)
+(** {2 String} *)
 
 type string = [ `String ] obj
 (** The JavaScript
@@ -245,7 +279,7 @@ module String : sig
   external to_string : t -> Stdlib.String.t = "%identity"
 end
 
-(** {3 Symbol} *)
+(** {2 Symbol} *)
 
 type symbol = [ `Symbol ] obj
 (** The JavaScript
@@ -271,7 +305,7 @@ module Symbol : sig
         Symbol} using [Symbol()]. *)
 end
 
-(** {3 Array} *)
+(** {2 Array} *)
 
 type +'a array = [ `Array of 'a ] obj
 (** The JavaScript
@@ -296,7 +330,7 @@ module Array : sig
   external to_list : 'a t -> 'a Stdlib.List.t = "caml_list_of_js_array"
 end
 
-(** {2 Unicode}
+(** {1 Unicode}
 
     Use {!val:unicode} when passing a Unicode string from OCaml to JavaScript.
 
@@ -337,7 +371,7 @@ external unicode : Stdlib.String.t -> Stdlib.String.t
 
     This is an alias for {!val:utf16}. *)
 
-(** {2 Global} *)
+(** {1 Global} *)
 
 val global : any
 (** See
@@ -387,7 +421,7 @@ val global : any
     dynamic type-checking is performed. It is up to the authors of the bindings
     to ensure they are using correct typing assumptions. *)
 
-(** {3:encode Encode}
+(** {2:encode Encode}
 
     Encode OCaml values into opaque JavaScript values. *)
 
@@ -481,7 +515,7 @@ module Encode : sig
   end
 end
 
-(** {3:decode Decode}
+(** {2:decode Decode}
 
     Decode OCaml values from opaque JavaScript values. *)
 
@@ -542,7 +576,7 @@ module Decode : sig
   (** Decode a generic JavaScript object. *)
 end
 
-(** {3:raw Raw JavaScript}
+(** {2:raw Raw JavaScript}
 
     The {!expr} and {!stmt} primitives embed untyped JavaScript code into the
     compiled output.
@@ -572,7 +606,7 @@ external stmt : Stdlib.String.t -> unit = "caml_js_expr"
       let () = Jx.stmt "console.log('hello')"
     ]} *)
 
-(** {2 Debug} *)
+(** {1 Debug} *)
 
 val debug : 'a -> unit
 (** Print the runtime representation of a value using

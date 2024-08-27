@@ -18,7 +18,7 @@ external utf8 : Stdlib.String.t -> Stdlib.String.t = "caml_string_of_jsstring"
 
 (** {2 Object} *)
 
-external get : 'c obj -> Stdlib.String.t -> any = "caml_js_get"
+external get : 'c obj -> Stdlib.String.t -> 'v obj = "caml_js_get"
 external set : 'c obj -> Stdlib.String.t -> 'v obj -> unit = "caml_js_set"
 external del : 'c obj -> Stdlib.String.t -> unit = "caml_js_delete"
 
