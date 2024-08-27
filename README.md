@@ -1,5 +1,7 @@
 # jx
 
+LEGACY CODE. This is kept here for future reference.
+
 Work with JavaScript values in OCaml.
 
 
