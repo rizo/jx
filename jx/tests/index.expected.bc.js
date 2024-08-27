@@ -1253,9 +1253,8 @@
      return caml_string_of_bytes(dst);
     }
    }
-   var global = globalThis;
    function log(x){console.log(x); return;}
-   var t = Date, t$0 = Text;
+   var global = globalThis, t = Date, t$0 = Text;
    global["window"];
    var document$0 = document;
    function word_count(str){

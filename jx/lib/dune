@@ -1,5 +1,5 @@
 (library
   (name jx)
   (public_name jx)
-  (modules Jx)
+  (modules Jx Jx_ffi)
   (modes byte))

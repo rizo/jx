@@ -159,6 +159,8 @@ end = struct
   let composed_path this = D.field this "composedPath" D.obj
   let none = Jx.int 0
   let capturing_phase = Jx.int 1
+
+  (* let capturing_phase = E.int 1 |> D.obj *)
   let at_target = Jx.int 2
   let bubbling_phase = Jx.int 3
   let event_phase this = D.field this "eventPhase" D.int
@@ -317,7 +319,7 @@ module Text : sig
   external of_any : Jx.any -> t = "%identity"
   external to_any : t -> Jx.any = "%identity"
   val make : unit -> t
-  val make_with_data : data:Jx.String.t -> unit -> t
+  val make_with_data : data:Jx.string -> unit -> t
 end = struct
   type t = [ `Text ] Jx.obj
 
@@ -415,7 +417,7 @@ end
 
 let window : [ `Window ] Jx.obj = D.field Jx.global "window" D.obj
 
-let parse_int_js (str : Jx.String.t) (radix : Jx.number) : Jx.number =
+let parse_int_js (str : Jx.string) (radix : Jx.number) : Jx.number =
   D.obj (D.func (Jx.expr "parseInt") [| E.any str; E.any radix |])
 
 let parse_int_ml (str : string) (radix : int) : int =

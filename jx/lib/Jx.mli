@@ -3,6 +3,20 @@
     This module provides types and functions to allow compile-time and runtime
     interoperability between JavaScript and OCaml. *)
 
+(** {2 Types}
+
+    All standard JavaScript types are directly representable in OCaml without
+    wrapping or any runtime conversions. This is achieved by providing
+    semi-abstract types for global JavaScript objects types like
+    {!section:number} and {!section:array}.
+
+    When interacting with JavaScript APIs you can either use the specialized
+    {!section:object} types for zero-cost access to values of that type, or you
+    can write {!section:bindings} that convert OCaml values to JavaScript and
+    vice-versa. *)
+
+(** {3:object Object} *)
+
 type +'c obj constraint 'c = [> ]
 (** Typed JavaScript objects.
 
@@ -21,7 +35,7 @@ type any = [ `Any ] obj
     JavaScript APIs.
 
     The JavaScript {!type:any} values can be converted to and from OCaml values
-    using conversion functions below. *)
+    using the {!module:Encode} and {!module:Decode} modules. *)
 
 type prop = string
 (** JavaScript object property names.
@@ -29,17 +43,299 @@ type prop = string
     {e Note:} Properties names with non-ASCII characters require transcoding
     (see {!section:unicode}). *)
 
-(** {2 Debug} *)
+external get : 'c obj -> prop -> any = "caml_js_get"
+external set : 'c obj -> prop -> 'v obj -> unit = "caml_js_set"
+external del : 'c obj -> prop -> unit = "caml_js_delete"
 
-val log : 'a -> unit
-(** Print the runtime representation of a value to the console. See
-    {{:https://developer.mozilla.org/en-US/docs/Web/API/console/log_static}
-      console.log}.*)
+external obj : (prop * any) Stdlib.Array.t -> 'c obj = "caml_js_object"
+(** [obj [| (prop1, v1); ... |]] is [{prop1: v1, ... }]. *)
 
-external debugger : unit -> unit = "debugger"
+external obj_new : 'c obj -> any Stdlib.Array.t -> 'a obj = "caml_js_new"
+(** [obj_new obj []] is [new obj(...args)]. *)
+
+external typeof : 'c obj -> Stdlib.String.t = "caml_js_typeof"
 (** See
-    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/debugger}
-      debugger}. *)
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof}
+      typeof}. *)
+
+external instanceof : 'c obj -> constr:'constr obj -> bool
+  = "caml_js_instanceof"
+(** See
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof}
+      instanceof}. *)
+
+external equal : 'c obj -> 'c obj -> bool = "caml_js_equals"
+(** See
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Equality}
+      Equality (==)}. *)
+
+external strict_equal : 'c obj -> 'c obj -> bool = "caml_js_strict_equals"
+(** See
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality}
+      Strict equality (===)}. *)
+
+(** The JavaScript
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object}
+      Object} class. *)
+module Object : sig
+  type 'a t = 'a obj
+end
+
+(** {3 Dict} *)
+
+type +'a dict = [ `Dict of 'a ] obj
+(** The type for JavaScript objects that act as containers for values of the
+    same type. *)
+
+external dict : (prop * 'a) Stdlib.Array.t -> 'a dict = "caml_js_object"
+(** An object with homogeneous value types. *)
+
+(** Operations on {!type:dict} values. *)
+module Dict : sig
+  type +'a t = 'a dict
+
+  external make : (prop * 'a) Stdlib.Array.t -> 'a t = "caml_js_object"
+  (** An object with homogeneous value types. *)
+end
+
+(** {3 Nullable}
+
+    Type-safe encoding of JavaScript values that can be null. *)
+
+type +'a nullable = [ `Nullable of 'a ] obj
+
+val null : 'a nullable
+external nullable : 'a -> 'a nullable = "%identity"
+val is_null : 'a nullable -> bool
+
+(* val nullable_of_any : any -> 'a nullable
+   external any_of_nullable : 'a nullable -> any = "%identity" *)
+
+(** Operations on {!type:nullable} values. *)
+module Nullable : sig
+  type +'a t = 'a nullable
+
+  val of_any : (any -> 'a) -> any -> 'a t
+  val to_any : ('a -> any) -> 'a t -> any
+  val of_option : 'a option -> 'a t
+  val to_option : 'a t -> 'a option
+  val get : 'a t -> 'a
+  external unsafe_get : 'a t -> 'a = "%identity"
+  val map : ('a -> 'b) -> 'a t -> 'b t
+
+  val map_or : 'b -> ('a -> 'b) -> 'a t -> 'b
+  (** [map_or default f nullable] is [f (get nullable)] if [nullable] is {e not}
+      {!val:null}, and [default] otherwise.
+
+      {[
+        Nullable.map_or 0 (fun x -> x + 1) nullable
+      ]} *)
+
+  val map_or_else : (unit -> 'b) -> ('a -> 'b) -> 'a t -> 'b
+  (** {[
+        Nullable.map_or_else (fun () -> 0) (fun x -> x + 1) nullable
+      ]} *)
+end
+
+(** {3 Undefined}
+
+    Type-safe encoding of JavaScript values that can be undefined. *)
+
+type +'a undefined = [ `Undefined of 'a ] obj
+
+val undefined : 'a undefined
+external defined : 'a -> 'a undefined = "%identity"
+val is_undefined : 'a undefined -> bool
+val is_defined : 'a undefined -> bool
+
+(** Operations on {!type:undefined} values. *)
+module Undefined : sig
+  type +'a t = 'a undefined
+
+  val of_any : (any -> 'a) -> any -> 'a t
+  val to_any : ('a -> any) -> 'a t -> any
+  val of_option : 'a option -> 'a t
+  val to_option : 'a t -> 'a option
+  val get : 'a t -> 'a
+  external unsafe_get : 'a t -> 'a = "%identity"
+  val map : ('a -> 'b) -> 'a t -> 'b t
+
+  val map_or : 'b -> ('a -> 'b) -> 'a t -> 'b
+  (** {[
+        Undefined.map_or 0 (fun x -> x + 1) undefined
+      ]} *)
+
+  val map_or_else : (unit -> 'b) -> ('a -> 'b) -> 'a t -> 'b
+  (** {[
+        Undefined.map_or_else (fun () -> 0) (fun x -> x + 1) undefined
+      ]} *)
+end
+
+(** {3 Boolean} *)
+
+type boolean = [ `Boolean ] obj
+
+external bool : Stdlib.Bool.t -> boolean = "caml_js_from_bool"
+(** Create a JavaScript Boolean from an OCaml bool. *)
+
+val true' : boolean
+val false' : boolean
+
+module Boolean : sig
+  type t = boolean
+
+  val true' : t
+  val false' : t
+  external of_bool : Stdlib.Bool.t -> t = "caml_js_from_bool"
+  external to_bool : t -> Stdlib.Bool.t = "caml_js_to_bool"
+end
+
+(** {3 Number} *)
+
+type number = [ `Number ] obj
+(** The JavaScript
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number}
+      Number} type. *)
+
+external int : Stdlib.Int.t -> number = "%identity"
+(** Create a JavaScript {!type:number} from an OCaml int. *)
+
+external float : Stdlib.Float.t -> number = "caml_js_from_float"
+(** Create a JavaScript {!type:number} from an OCaml float. *)
+
+external int32 : Stdlib.Int32.t -> number = "caml_js_from_int32"
+(** Create a JavaScript {!type:number} from an OCaml int32. *)
+
+external nativeint : Stdlib.Nativeint.t -> number = "caml_js_from_nativeint"
+(** Create a JavaScript {!type:number} from an OCaml nativeint. *)
+
+(** The JavaScript
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number}
+      Number} class. *)
+module Number : sig
+  type t = number
+
+  external of_int : Stdlib.Int.t -> t = "%identity"
+  external to_int : t -> Stdlib.Int.t = "%identity"
+  external of_float : Stdlib.Float.t -> t = "caml_js_from_float"
+  external to_float : t -> Stdlib.Float.t = "caml_js_to_float"
+  external of_int32 : Int32.t -> t = "caml_js_from_int32"
+  external to_int32 : t -> Int32.t = "caml_js_to_int32"
+  external of_nativeint : nativeint -> t = "caml_js_from_nativeint"
+  external to_nativeint : t -> nativeint = "caml_js_to_nativeint"
+end
+
+(** {3 String} *)
+
+type string = [ `String ] obj
+(** The JavaScript
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String}
+      String} type. *)
+
+external string : Stdlib.String.t -> string = "%identity"
+(** Create a JavaScript String from an OCaml string. *)
+
+(** The JavaScript
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String}
+      String} class. *)
+module String : sig
+  type t = string
+
+  external of_string : Stdlib.String.t -> t = "%identity"
+  external to_string : t -> Stdlib.String.t = "%identity"
+end
+
+(** {3 Symbol} *)
+
+type symbol = [ `Symbol ] obj
+(** The JavaScript
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol}
+      Symbol} type. *)
+
+val symbol : Stdlib.String.t -> symbol
+(** Create a
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/Symbol}
+      Symbol} with a description. *)
+
+module Symbol : sig
+  type t = symbol
+
+  val make : Stdlib.String.t -> t
+  (** Create a
+      {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/Symbol}
+        Symbol} with a description. *)
+
+  val empty : unit -> t
+  (** Create a
+      {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/Symbol}
+        Symbol} using [Symbol()]. *)
+end
+
+(** {3 Array} *)
+
+type +'a array = [ `Array of 'a ] obj
+(** The JavaScript
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array}
+      Array} type. *)
+
+external array : 'a Stdlib.Array.t -> 'a array = "caml_js_from_array"
+(** Create a JavaScript Array from an OCaml array. *)
+
+external list : 'a Stdlib.List.t -> 'a array = "caml_list_to_js_array"
+(** Create a JavaScript Array from an OCaml list. *)
+
+(** The JavaScript
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array}
+      Array} class. *)
+module Array : sig
+  type +'a t = 'a array
+
+  external of_array : 'a Stdlib.Array.t -> 'a t = "caml_js_from_array"
+  external to_array : 'a t -> 'a Stdlib.Array.t = "caml_js_to_array"
+  external of_list : 'a Stdlib.List.t -> 'a t = "caml_list_to_js_array"
+  external to_list : 'a t -> 'a Stdlib.List.t = "caml_list_of_js_array"
+end
+
+(** {2 Unicode}
+
+    Use {!val:unicode} when passing a Unicode string from OCaml to JavaScript.
+
+    {[
+      Jx.log (Jx.unicode "Olá, OCaml! 🐫")
+    ]}
+
+    This is needed because the Unicode encoding in JavaScript and OCaml are
+    different:
+
+    - Strings in JavaScript use UTF-16.
+    - Strings in OCaml, while being arbitrary sequences of bytes, typically use
+      UTF-8.
+
+    This means that an OCaml Unicode string is {e not} a valid JavaScript
+    Unicode string. Transcoding functions between UTF-8 and UTF-16 are provided
+    below.
+
+    {e Note:} Regular ASCII strings do not require transcoding.
+
+    See
+    {{:https://ocaml.org/manual/4.12/api/String.html} String in The OCaml
+      Manual}.
+
+    See
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String}
+      String on MDN}. *)
+
+external utf16 : Stdlib.String.t -> Stdlib.String.t = "caml_jsstring_of_string"
+(** Transcode a string from UTF-8 to UTF-16. *)
+
+external utf8 : Stdlib.String.t -> Stdlib.String.t = "caml_string_of_jsstring"
+(** Transcode a string from UTF-16 to UTF-8. *)
+
+external unicode : Stdlib.String.t -> Stdlib.String.t
+  = "caml_jsstring_of_string"
+(** Transcode a string from UTF-8 to UTF-16 for usage with JavaScript.
+
+    This is an alias for {!val:utf16}. *)
 
 (** {2 Global} *)
 
@@ -75,7 +371,7 @@ val global : any
 
     In the above example, {!Jx.expr} is used to obtain a reference to the
     JavaScript [parseInt] function. It is then decoded as a function and called
-    with an array of JavaScript-encoded values. Finally, the return value is
+    with an array of JavaScript-encoded arguments. Finally, the return value is
     decoded as an integer.
 
     After compilation, the following JavaScript code should be produced (in
@@ -84,7 +380,12 @@ val global : any
     {@javascript[
       var x = parseInt("42", 10);
       console.log(x)
-    ]} *)
+    ]}
+
+    {b Warning:} The conversion modules and other low-level primitives provided
+    here are unsafe by nature. When values are decoded or encoded, no static or
+    dynamic type-checking is performed. It is up to the authors of the bindings
+    to ensure they are using correct typing assumptions. *)
 
 (** {3:encode Encode}
 
@@ -243,8 +544,8 @@ end
 
 (** {3:raw Raw JavaScript}
 
-    The {!expr} and {!stmt} functions can be used to embed untyped JavaScript
-    code into the compiled application.
+    The {!expr} and {!stmt} primitives embed untyped JavaScript code into the
+    compiled output.
 
     The textual representation of the code must be valid JavaScript, otherwise
     the compilation will fail.
@@ -254,202 +555,36 @@ end
     fallback to runtime and an error will be thrown (check the console for
     evaluation errors).
 
-    {b Warning:} Using {!expr} and {!stmt} is extremely unsafe since no
-    type-checking is performed by the compiler on the embedded JavaScript code.
-    Use this feature with special care! *)
+    {b Warning:} {!expr} and {!stmt} are unsafe since no type-checking is
+    performed on the embedded code. *)
 
-external expr : string -> 'c obj = "caml_pure_js_expr"
+external expr : Stdlib.String.t -> 'c obj = "caml_pure_js_expr"
 (** Unsafe JavaScript expression.
 
     {[
       assert (Jx.Decode.int (Jx.expr "2 + 2") = 4)
     ]} *)
 
-external stmt : string -> unit = "caml_js_expr"
+external stmt : Stdlib.String.t -> unit = "caml_js_expr"
 (** Unsafe JavaScript statement.
 
     {[
       let () = Jx.stmt "console.log('hello')"
     ]} *)
 
-(** {2 Unicode}
+(** {2 Debug} *)
 
-    Use {!val:unicode} when passing a Unicode string from OCaml to JavaScript.
+val debug : 'a -> unit
+(** Print the runtime representation of a value using
+    {{:https://developer.mozilla.org/en-US/docs/Web/API/console/debug_static}
+      console.debug}.*)
 
-    {[
-      Jx.log (Jx.unicode "Olá, OCaml! 🐫")
-    ]}
+val log : 'a -> unit
+(** Print the runtime representation of a value using
+    {{:https://developer.mozilla.org/en-US/docs/Web/API/console/log_static}
+      console.log}.*)
 
-    This is needed because the Unicode representations in JavaScript and OCaml
-    are different:
-
-    - Strings in JavaScript use the UTF-16 Unicode encoding.
-    - Strings in OCaml, while being arbitrary sequences of bytes, normally use
-      the UTF-8 Unicode encoding.
-
-    This means that an OCaml Unicode string is {e not} a valid JavaScript
-    Unicode string. Transcoding functions between UTF-8 and UTF-16 are provided
-    below.
-
-    {e Note:} Regular ASCII strings do not require transcoding.
-
-    See
-    {{:https://ocaml.org/manual/4.12/api/String.html} String in The OCaml
-      Manual}.
-
-    See
-    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String}
-      String on MDN}. *)
-
-external utf16 : string -> string = "caml_jsstring_of_string"
-(** Transcode a string from UTF-8 to UTF-16. *)
-
-external utf8 : string -> string = "caml_string_of_jsstring"
-(** Transcode a string from UTF-16 to UTF-8. *)
-
-external unicode : string -> string = "caml_jsstring_of_string"
-(** Transcode a string from UTF-8 to UTF-16. This is an alias for {!val:utf16}. *)
-
-(** {2 Types} *)
-
-(** {3 Object} *)
-
-external get : 'c obj -> prop -> any = "caml_js_get"
-external set : 'c obj -> prop -> 'v obj -> unit = "caml_js_set"
-external del : 'c obj -> prop -> unit = "caml_js_delete"
-
-external obj : (prop * any) Stdlib.Array.t -> 'c obj = "caml_js_object"
-(** [obj [| (prop1, v1); ... |]] is [{prop1: v1, ... }]. *)
-
-external obj_new : 'c obj -> any Stdlib.Array.t -> 'a obj = "caml_js_new"
-(** [obj_new obj []] is [new obj(...args)]. *)
-
-external typeof : 'c obj -> Stdlib.String.t = "caml_js_typeof"
+external debugger : unit -> unit = "debugger"
 (** See
-    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof}
-      typeof}. *)
-
-external instanceof : 'c obj -> constr:'constr obj -> bool
-  = "caml_js_instanceof"
-(** See
-    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof}
-      instanceof}. *)
-
-external equal : 'c obj -> 'c obj -> bool = "caml_js_equals"
-(** See
-    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Equality}
-      Equality (==)}. *)
-
-external strict_equal : 'c obj -> 'c obj -> bool = "caml_js_strict_equals"
-(** See
-    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality}
-      Strict equality (===)}. *)
-
-(** {3 Nullable} *)
-
-type +'a nullable = [ `Nullable of 'a ] obj
-
-val null : 'a nullable
-external nullable : 'a -> 'a nullable = "%identity"
-val is_null : 'a nullable -> bool
-
-(** The type-safe encoding of JavaScript values that can be null. *)
-
-module Nullable : sig
-  type +'a t = 'a nullable
-
-  val of_any : (any -> 'a) -> any -> 'a t
-  val to_any : ('a -> any) -> 'a t -> any
-  val of_option : 'a option -> 'a t
-  val to_option : 'a t -> 'a option
-  val get : 'a t -> 'a
-  external unsafe_get : 'a t -> 'a = "%identity"
-  val map : ('a -> 'b) -> 'a t -> 'b t
-
-  val map_or : 'b -> ('a -> 'b) -> 'a t -> 'b
-  (** [map_or default f nullable] is [f (get nullable)] if [nullable] is {e not}
-      {!val:null}, and [default] otherwise.
-
-      {[
-        Nullable.map_or 0 (fun x -> x + 1) nullable
-      ]} *)
-
-  val map_or_else : (unit -> 'b) -> ('a -> 'b) -> 'a t -> 'b
-  (** {[
-        Nullable.map_or (fun () -> 0) (fun x -> x + 1) nullable
-      ]} *)
-end
-
-(* val nullable_of_any : any -> 'a nullable
-   external any_of_nullable : 'a nullable -> any = "%identity" *)
-
-(** {3 Undefined} *)
-
-type +'a undefined = [ `Undefined of 'a ] obj
-
-val undefined : 'a undefined
-external defined : 'a -> 'a undefined = "%identity"
-val is_undefined : 'a undefined -> bool
-val is_defined : 'a undefined -> bool
-
-module Undefined : sig
-  type +'a t = 'a undefined
-
-  val of_any : (any -> 'a) -> any -> 'a t
-  val to_any : ('a -> any) -> 'a t -> any
-  val of_option : 'a option -> 'a t
-  val to_option : 'a t -> 'a option
-  val get : 'a t -> 'a
-  external unsafe_get : 'a t -> 'a = "%identity"
-  val map : ('a -> 'b) -> 'a t -> 'b t
-
-  val map_or : 'b -> ('a -> 'b) -> 'a t -> 'b
-  (** {[
-        Undefined.map_or 0 (fun x -> x + 1) undefined
-      ]} *)
-
-  val map_or_else : (unit -> 'b) -> ('a -> 'b) -> 'a t -> 'b
-  (** {[
-        Undefined.map_or (fun () -> 0) (fun x -> x + 1) undefined
-      ]} *)
-end
-
-(** {3 Boolean} *)
-
-type boolean = [ `Boolean ] obj
-
-val true' : boolean
-val false' : boolean
-external bool : Stdlib.Bool.t -> boolean = "caml_js_from_bool"
-external to_bool : boolean -> Stdlib.Bool.t = "caml_js_to_bool"
-
-(** {3 Number} *)
-
-type number = [ `Number ] obj
-
-external int : Stdlib.Int.t -> number = "%identity"
-external to_int : number -> Stdlib.Int.t = "%identity"
-external float : Stdlib.Float.t -> number = "caml_js_from_float"
-external to_float : number -> Stdlib.Float.t = "caml_js_to_float"
-external int32 : Int32.t -> number = "caml_js_from_int32"
-external to_int32 : number -> Int32.t = "caml_js_to_int32"
-external nativeint : nativeint -> number = "caml_js_from_nativeint"
-external to_nativeint : number -> nativeint = "caml_js_to_nativeint"
-
-(** {3 String} *)
-
-module String : sig
-  type t = [ `String ] obj
-end
-
-external string : string -> String.t = "%identity"
-external to_string : String.t -> string = "%identity"
-
-(** {3 Array} *)
-
-type +'a array = [ `Array of 'a ] obj
-
-external array : 'a Stdlib.Array.t -> 'a array = "caml_js_from_array"
-external to_array : 'a array -> 'a Stdlib.Array.t = "caml_js_to_array"
-external list : 'a list -> 'a array = "caml_list_to_js_array"
-external to_list : 'a array -> 'a list = "caml_list_of_js_array"
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/debugger}
+      debugger}. *)
