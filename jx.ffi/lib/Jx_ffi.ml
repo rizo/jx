@@ -1,6 +1,5 @@
-(** A minimal and dependency-free subset of {{:../Jx/index.html} Jx}.
-
-    This library is reserved for library authors. *)
+(** A minimal and dependency-free subset of {{!module:Jx} jx} focused on
+    bindings. *)
 
 type +'cls obj constraint 'cls = [> ]
 type any = [ `Any ] obj
@@ -335,7 +334,7 @@ external list : 'a Stdlib.List.t -> 'a array = "caml_list_to_js_array"
 
 (* Function *)
 
-type function' = [ `Function ] obj
+type func = [ `Function ] obj
 
 (* Dict *)
 

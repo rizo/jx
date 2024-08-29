@@ -1,41 +1,11 @@
-(** External JavaScript language interface for OCaml.
+(** External JavaScript interface for OCaml.
 
-    This module provides definitions and external primitives that facilitate
-    type-safe compile-time and runtime interoperability between JavaScript and
-    OCaml using the {{:https://github.com/ocsigen/js_of_ocaml} js_of_ocaml}
-    compiler.
+    This module provides bindings for standard JavaScript objects and external
+    primitives that allow type-safe compile-time and runtime interoperability
+    between JavaScript and OCaml.
 
-    {b Example:}
-
-    The following example provides bindings for the
-    {{:https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById}
-      getElementById} method of the global
-    {{:https://developer.mozilla.org/en-US/docs/Web/API/Document} document}
-    object.
-
-    {[
-      module E = Jx.Encode
-      module D = Jx.Decode
-
-      (* Bind the global document object. *)
-      let document : [ `Document ] Jx.obj = Jx.expr "document"
-
-      (* Bind the getElementById method call. *)
-      let get_element_by_id id : [ `Element ] Jx.obj =
-        D.obj (D.meth document "getElementById" [| E.string id |])
-
-      let () = Jx.log (get_element_by_id "container")
-    ]}
-
-    Which generates the following code (in addition to the OCaml runtime):
-
-    {@javascript[
-      log (document.getElementById "container")
-    ]}
-
-    In this example, the {!module:Decode} and {!module:Encode} modules are used
-    to encode the method arguments and decode the return object. Type
-    annotations are used to constrain the {{!type:obj} object class}. *)
+    Start by exploring the standard JavaScript {!section:types} or learning
+    about the {!section:bindings} API. *)
 
 (** {1 Types}
 
@@ -330,6 +300,17 @@ module Array : sig
   external to_list : 'a t -> 'a Stdlib.List.t = "caml_list_of_js_array"
 end
 
+(** {2 Promise} *)
+
+type +'a promise = [ `Promise of 'a ] obj
+(** The JavaScript
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise}
+      Promise} type. *)
+
+module Promise : sig
+  type +'a t = 'a promise
+end
+
 (** {1 Unicode}
 
     Use {!val:unicode} when passing a Unicode string from OCaml to JavaScript.
@@ -382,44 +363,52 @@ val global : any
       let window : [ `Window ] Jx.obj = Jx.get Jx.global "window"
     ]} *)
 
-(** {2:bindings Bindings}
+(** {1:bindings Bindings}
 
-    Bindings are definitions that allow accessing JavaScript functions and
-    classes from OCaml.
+    Bindings for accessing JavaScript definitions can be directly written in
+    OCaml using the value encoding and decoding primitives provided below.
 
-    The following example uses the {!module:Encode} and {!module:Decode} modules
-    to provide bindings for the builtin
-    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/parseInt}
-      parseInt} JavaScript function:
+    {b Note:} Library authors who want to publish their bindings should consider
+    using the {{!module:Jx_ffi} jx.ffi} library which provides a minimal and
+    dependency-free subset of the present FFI API.
+
+    The following example defines bindings for the
+    {{:https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById}
+      getElementById} method of the global
+    {{:https://developer.mozilla.org/en-US/docs/Web/API/Document} document}
+    object.
 
     {[
       module E = Jx.Encode
       module D = Jx.Decode
 
-      (* val parse_int : radix:int -> string -> int *)
-      let parse_int ~radix str =
-        D.int (D.func (Jx.expr "parseInt") [| E.string str; E.int radix |])
+      type document = [ `Document ] Jx.obj
+      type element = [ `Element ] Jx.obj
 
-      let () = Jx.log (parse_int ~radix:10 "42")
+      (* Bind the global document object. *)
+      let document : document = Jx.expr "document"
+
+      (* Bind the getElementById method call. *)
+      let get_element_by_id id : element =
+        D.obj (D.meth document "getElementById" [| E.string id |])
+
+      let () = Jx.log (get_element_by_id "container")
     ]}
 
-    In the above example, {!Jx.expr} is used to obtain a reference to the
-    JavaScript [parseInt] function. It is then decoded as a function and called
-    with an array of JavaScript-encoded arguments. Finally, the return value is
-    decoded as an integer.
-
-    After compilation, the following JavaScript code should be produced (in
-    addition to the OCaml runtime):
+    Which generates the following code (in addition to the OCaml runtime):
 
     {@javascript[
-      var x = parseInt("42", 10);
-      console.log(x)
+      log (document.getElementById "container")
     ]}
+
+    In this example, the {!module:Decode} and {!module:Encode} modules are used
+    to encode the method arguments and decode the return object. Type
+    annotations are used to constrain the {{!type:obj} object class}.
 
     {b Warning:} The conversion modules and other low-level primitives provided
     here are unsafe by nature. When values are decoded or encoded, no static or
-    dynamic type-checking is performed. It is up to the authors of the bindings
-    to ensure they are using correct typing assumptions. *)
+    dynamic type-checking is performed. Binding authors should ensure that
+    correct type conversions and coercions are used. *)
 
 (** {2:encode Encode}
 
