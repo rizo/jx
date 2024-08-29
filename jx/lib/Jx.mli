@@ -363,14 +363,14 @@ val global : any
       let window : [ `Window ] Jx.obj = Jx.get Jx.global "window"
     ]} *)
 
+(* {b Note:} Library authors who want to publish their bindings should consider
+   using the {{!module:Jx_ffi} jx.ffi} library which provides a minimal and
+   dependency-free subset of the present FFI API. *)
+
 (** {1:bindings Bindings}
 
     Bindings for accessing JavaScript definitions can be directly written in
     OCaml using the value encoding and decoding primitives provided below.
-
-    {b Note:} Library authors who want to publish their bindings should consider
-    using the {{!module:Jx_ffi} jx.ffi} library which provides a minimal and
-    dependency-free subset of the present FFI API.
 
     The following example defines bindings for the
     {{:https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById}

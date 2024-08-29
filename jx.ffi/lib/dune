@@ -1,5 +1,0 @@
-(library
-  (name jx_ffi)
-  (public_name jx.ffi)
-  (modules Jx_ffi)
-  (modes byte))
