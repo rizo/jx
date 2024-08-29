@@ -141,20 +141,21 @@ module Nullable : sig
       ]} *)
 end
 
-(** {2 Undefined}
+(** {2 Optional}
 
-    Type-safe encoding of JavaScript values that can be undefined. *)
+    Type-safe encoding of JavaScript values that can be [undefined]. Not to be
+    confused with OCaml's standard [Option] type. *)
 
-type +'a undefined = [ `Undefined of 'a ] obj
+type +'a optional = [ `Optional of 'a ] obj
 
-val undefined : 'a undefined
-external defined : 'a -> 'a undefined = "%identity"
-val is_undefined : 'a undefined -> bool
-val is_defined : 'a undefined -> bool
+val undefined : 'a optional
+external defined : 'a -> 'a optional = "%identity"
+val is_undefined : 'a optional -> bool
+val is_defined : 'a optional -> bool
 
-(** Operations on {!type:undefined} values. *)
-module Undefined : sig
-  type +'a t = 'a undefined
+(** Operations on {!type:optional} values. *)
+module Optional : sig
+  type +'a t = 'a optional
 
   val of_any : (any -> 'a) -> any -> 'a t
   val to_any : ('a -> any) -> 'a t -> any
@@ -166,12 +167,12 @@ module Undefined : sig
 
   val map_or : 'b -> ('a -> 'b) -> 'a t -> 'b
   (** {[
-        Undefined.map_or 0 (fun x -> x + 1) undefined
+        Optional.map_or 0 (fun x -> x + 1) optional
       ]} *)
 
   val map_or_else : (unit -> 'b) -> ('a -> 'b) -> 'a t -> 'b
   (** {[
-        Undefined.map_or_else (fun () -> 0) (fun x -> x + 1) undefined
+        Optional.map_or_else (fun () -> 0) (fun x -> x + 1) optional
       ]} *)
 end
 
@@ -310,6 +311,13 @@ type +'a promise = [ `Promise of 'a ] obj
 module Promise : sig
   type +'a t = 'a promise
 end
+
+(** {2 BigInt} *)
+
+type bigint = [ `Bigint ] obj
+(** The JavaScript
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt}
+      BigInt} type. *)
 
 (** {1 Unicode}
 
@@ -463,13 +471,13 @@ module Encode : sig
   val any_nullable : 'a option -> any
   (** Like {!val:nullable} but specialized for options of generic values. *)
 
-  val undefined : ('a -> any) -> 'a option -> any
+  val optional : ('a -> any) -> 'a option -> any
   (** Encode an OCaml option as JavaScript value that can be [undefined]. *)
 
-  val obj_undefined : 'a obj option -> any
+  val obj_optional : 'a obj option -> any
   (** Like {!val:undefined} but specialized for options of JavaScript objects. *)
 
-  val any_undefined : 'a option -> any
+  val any_optional : 'a option -> any
   (** Like {!val:undefined} but specialized for options of generic values. *)
 
   val field : 'c obj -> prop -> ('a -> any) -> 'a -> unit
@@ -545,10 +553,10 @@ module Decode : sig
   val obj_nullable : any -> 'a obj option
   (** Like {!val:nullable} but specialized for options of JavaScript objects. *)
 
-  val undefined : (any -> 'a) -> any -> 'a option
+  val optional : (any -> 'a) -> any -> 'a option
   (** Decode an OCaml option from a JavaScript value that can be [undefined]. *)
 
-  val obj_undefined : any -> 'a obj option
+  val obj_optional : any -> 'a obj option
   (** Like {!val:undefined} but specialized for options of JavaScript objects. *)
 
   val field : 'c obj -> prop -> (any -> 'a) -> 'a

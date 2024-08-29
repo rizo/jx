@@ -83,10 +83,10 @@ external nullable : 'a -> 'a Nullable.t = "%identity"
 let null = Nullable.null
 let is_null = Nullable.is_null
 
-(** {2 Undefined} *)
+(** {2 Optional} *)
 
-module Undefined = struct
-  type +'a t = [ `Undefined of 'a ] obj
+module Optional = struct
+  type +'a t = [ `Optional of 'a ] obj
 
   let undefined = expr "undefined"
 
@@ -112,7 +112,7 @@ module Undefined = struct
     if is_undefined this then None else Some (unsafe_get this)
 
   let get this =
-    if is_undefined this then failwith "Undefined.get" else unsafe_get this
+    if is_undefined this then failwith "Optional.get" else unsafe_get this
 
   let map f this =
     if is_undefined this then undefined else defined (f (unsafe_get this))
@@ -124,14 +124,14 @@ module Undefined = struct
     if is_undefined this then get_default () else f (unsafe_get this)
 end
 
-type +'a undefined = 'a Undefined.t
+type +'a optional = 'a Optional.t
 
-let undefined = Undefined.undefined
+let undefined = Optional.undefined
 
-external defined : 'a -> 'a Undefined.t = "%identity"
+external defined : 'a -> 'a Optional.t = "%identity"
 
-let is_undefined = Undefined.is_undefined
-let is_defined = Undefined.is_defined
+let is_undefined = Optional.is_undefined
+let is_defined = Optional.is_defined
 
 (** {2 Conversion} *)
 
@@ -183,16 +183,16 @@ module Encode = struct
     | None -> null
     | Some x -> encode x
 
-  (* undefined *)
+  (* optional *)
 
-  external any_undefined : 'a option -> any = "%identity"
+  external any_optional : 'a option -> any = "%identity"
 
-  let obj_undefined opt =
+  let obj_optional opt =
     match opt with
     | None -> undefined
     | Some x -> obj x
 
-  let undefined encode opt =
+  let optional encode opt =
     match opt with
     | None -> undefined
     | Some x -> encode x
@@ -261,9 +261,9 @@ module Decode = struct
 
   (* undefined *)
 
-  let undefined decode js = if is_undefined js then None else Some (decode js)
+  let optional decode js = if is_undefined js then None else Some (decode js)
 
-  let obj_undefined any =
+  let obj_optional any =
     let any_obj = obj any in
     if is_undefined any_obj then None else Some any_obj
 
@@ -346,3 +346,7 @@ external dict : (prop * 'a) Stdlib.Array.t -> 'a dict = "caml_js_object"
 (* Promise *)
 
 type 'a promise = [ `Promise of 'a ] obj
+
+(* BigInt *)
+
+type bigint = [ `Bigint ] obj
