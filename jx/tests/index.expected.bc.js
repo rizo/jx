@@ -1253,6 +1253,7 @@
      return caml_string_of_bytes(dst);
     }
    }
+   var null$0 = null;
    function log(x){console.log(x); return;}
    var global = globalThis, t = Date, t$0 = Text;
    global["window"];
@@ -1303,11 +1304,14 @@
    log(str_ascii_1);
    log(str_ascii_1$0);
    log(str_unicode_1$0);
+   log("-- Object --");
    var dict = {};
    dict[str_ascii_1] = 101;
    dict[str_unicode_1$0] = 102;
    dict[str_ascii_1$0] = 103;
    log(dict);
+   var obj = {a: 42, b: "hello", c: null$0};
+   log(obj);
    log("-- Embed JavaScript --");
    log(2 > 1 ? "static expr" : "no");
    console.log("raw expr");

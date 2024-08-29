@@ -31,11 +31,23 @@ let () =
   Jx.log str_ascii_1;
   Jx.log str_ascii_1';
   Jx.log str_unicode_1';
+
+  Jx.log "-- Object --";
   let dict = Jx.obj [||] in
   Jx.set dict str_ascii_1 (Jx.int 101);
   Jx.set dict str_unicode_1' (Jx.int 102);
   Jx.set dict str_ascii_1' (Jx.int 103);
   Jx.log dict;
+
+  let obj =
+    Jx.obj
+      [|
+        ("a", Jx.Encode.int 42);
+        ("b", Jx.Encode.string "hello");
+        ("c", Jx.Encode.obj Jx.null);
+      |]
+  in
+  Jx.log obj;
 
   Jx.log "-- Embed JavaScript --";
   let _optimized_away = Jx.expr {|2 + 2|} in
