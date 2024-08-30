@@ -48,7 +48,7 @@ module Nullable = struct
 
   external make : 'a -> 'a t = "%identity"
 
-  let is_null this = Stdlib.( == ) this null
+  let is_null this = strict_equal this null
 
   external unsafe_get : 'a t -> 'a = "%identity"
 
@@ -92,7 +92,7 @@ module Optional = struct
 
   external defined : 'a -> 'a t = "%identity"
 
-  let is_undefined this = Stdlib.( == ) this undefined
+  let is_undefined this = strict_equal this undefined
   let is_defined this = not (is_undefined this)
 
   external unsafe_get : 'a t -> 'a = "%identity"
@@ -235,6 +235,7 @@ module Decode = struct
 
   external bool : any -> bool = "caml_js_to_bool"
   external int : any -> int = "%identity"
+  external char : any -> char = "%identity"
   external float : any -> float = "caml_js_to_float"
 
   (* string *)

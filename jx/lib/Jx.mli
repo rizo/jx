@@ -433,7 +433,7 @@ module Encode : sig
   (** Encode an OCaml int value. *)
 
   external char : char -> any = "%identity"
-  (** Encode an OCaml char value. *)
+  (** Encode an OCaml char value as a JavaScript number. *)
 
   external float : float -> any = "caml_js_from_float"
   (** Encode an OCaml float value. *)
@@ -525,6 +525,9 @@ module Decode : sig
 
   external int : any -> int = "%identity"
   (** Decode an OCaml int value. *)
+
+  external char : any -> char = "%identity"
+  (** Decode an OCaml char value from a JavaScript number. *)
 
   external float : any -> float = "caml_js_to_float"
   (** Decode an OCaml float value. *)
