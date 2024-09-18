@@ -81,6 +81,16 @@ let () =
   Jx.log (Jx.Number.to_exponential ~fraction_digits:4 (Jx.float Float.pi));
   Jx.log (Jx.Number.to_fixed ~fraction_digits:2 (Jx.float Float.pi));
 
+  Jx.log "Jx.Math";
+  Jx.log Jx.Math.e;
+  Jx.log Jx.Math.ln2;
+  Jx.log Jx.Math.pi;
+  Jx.log Jx.Math.sqrt2;
+  Jx.log (Jx.Math.random ());
+  Jx.log (Jx.Math.abs (Jx.int 4));
+  Jx.log (Jx.Math.abs (Jx.float (-4.3)));
+  Jx.log (Jx.Math.max [| Jx.int 4; Jx.int 22; Jx.int 999; Jx.int (-23) |]);
+
   let body =
     Document.query_selector ~selectors:"body" document |> Jx.Nullable.unsafe_get
   in

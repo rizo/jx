@@ -462,6 +462,198 @@ external unicode : Stdlib.String.t -> Stdlib.String.t
 
     This is an alias for {!val:utf16}. *)
 
+(** {1 Math} *)
+
+module Math : sig
+  (** {2 Static properties} *)
+
+  val e : number
+  val ln10 : number
+  val ln2 : number
+  val log10e : number
+  val log2e : number
+  val pi : number
+  val sqrt1_2 : number
+  val sqrt2 : number
+
+  (** {2 Static methods} *)
+
+  val abs : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/abs} [abs] on
+        MDN}. *)
+
+  val acos : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/acos} [acos] on
+        MDN}. *)
+
+  val acosh : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/acosh} [acosh] on
+        MDN}. *)
+
+  val asin : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/asin} [asin] on
+        MDN}. *)
+
+  val asinh : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/asinh} [asinh] on
+        MDN}. *)
+
+  val atan : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/atan} [atan] on
+        MDN}. *)
+
+  val atanh : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/atanh} [atanh] on
+        MDN}. *)
+
+  val atan2 : number -> number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/atan2} [atan2] on
+        MDN}. *)
+
+  val cbrt : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/cbrt} [cbrt] on
+        MDN}. *)
+
+  val ceil : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/ceil} [ceil] on
+        MDN}. *)
+
+  val clz32 : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/clz32} [clz32] on
+        MDN}. *)
+
+  val cos : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/cos} [cos] on
+        MDN}. *)
+
+  val cosh : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/cosh} [cosh] on
+        MDN}. *)
+
+  val exp : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/exp} [exp] on
+        MDN}. *)
+
+  val expm1 : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/expm1} [expm1] on
+        MDN}. *)
+
+  val floor : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/floor} [floor] on
+        MDN}. *)
+
+  val fround : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/fround} [fround]
+        on MDN}. *)
+
+  val hypot : number Stdlib.Array.t -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/hypot} [hypot] on
+        MDN}. *)
+
+  val imul : number -> number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/imul} [imul] on
+        MDN}. *)
+
+  val log : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/log} [log] on
+        MDN}. *)
+
+  val log1p : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/log1p} [log1p] on
+        MDN}. *)
+
+  val log10 : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/log10} [log10] on
+        MDN}. *)
+
+  val log2 : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/log2} [log2] on
+        MDN}. *)
+
+  val max : number Stdlib.Array.t -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/max} [max] on
+        MDN}. *)
+
+  val min : number Stdlib.Array.t -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/min} [min] on
+        MDN}. *)
+
+  val pow : number -> number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/pow} [pow] on
+        MDN}. *)
+
+  val random : unit -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/random} [random]
+        on MDN}. *)
+
+  val round : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/round} [round] on
+        MDN}. *)
+
+  val sign : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/sign} [sign] on
+        MDN}. *)
+
+  val sin : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/sin} [sin] on
+        MDN}. *)
+
+  val sinh : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/sinh} [sinh] on
+        MDN}. *)
+
+  val sqrt : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/sqrt} [sqrt] on
+        MDN}. *)
+
+  val tan : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/tan} [tan] on
+        MDN}. *)
+
+  val tanh : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/tanh} [tanh] on
+        MDN}. *)
+
+  val trunc : number -> number
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/trunc} [trunc] on
+        MDN}. *)
+end
+
 (** {1 Global} *)
 
 val global : any

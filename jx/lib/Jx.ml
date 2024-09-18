@@ -133,3 +133,150 @@ end
 module Promise = struct
   type 'a t = [ `Promise of 'a ] Jx_ffi.obj
 end
+
+(* Math *)
+
+module Math = struct
+  let e = expr "Math.E"
+  let ln10 = expr "Math.LN10"
+  let ln2 = expr "Math.LN2"
+  let log10e = expr "Math.LOG10E"
+  let log2e = expr "Math.LOG2E"
+  let pi = expr "Math.PI"
+  let sqrt1_2 = expr "Math.SQRT1_2"
+  let sqrt2 = expr "Math.SQRT2"
+
+  let abs x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.abs") [| x |])
+
+  let acos x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.acos") [| x |])
+
+  let acosh x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.acosh") [| x |])
+
+  let asin x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.asin") [| x |])
+
+  let asinh x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.asinh") [| x |])
+
+  let atan x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.atan") [| x |])
+
+  let atanh x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.atanh") [| x |])
+
+  let atan2 x y =
+    let x = E.obj x in
+    let y = E.obj y in
+    D.obj (D.func (expr "Math.atan2") [| x; y |])
+
+  let cbrt x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.cbrt") [| x |])
+
+  let ceil x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.ceil") [| x |])
+
+  let clz32 x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.clz32") [| x |])
+
+  let cos x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.cos") [| x |])
+
+  let cosh x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.cosh") [| x |])
+
+  let exp x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.exp") [| x |])
+
+  let expm1 x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.expm1") [| x |])
+
+  let floor x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.floor") [| x |])
+
+  let fround x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.fround") [| x |])
+
+  let hypot values = D.obj (D.func (expr "Math.hypot") (E.Array.obj values))
+
+  let imul x y =
+    let x = E.obj x in
+    let y = E.obj y in
+    D.obj (D.func (expr "Math.imul") [| x; y |])
+
+  let log x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.log") [| x |])
+
+  let log1p x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.log1p") [| x |])
+
+  let log10 x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.log10") [| x |])
+
+  let log2 x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.log2") [| x |])
+
+  let max values = D.obj (D.func (expr "Math.max") (E.Array.obj values))
+  let min values = D.obj (D.func (expr "Math.min") (E.Array.obj values))
+
+  let pow x y =
+    let x = E.obj x in
+    let y = E.obj y in
+    D.obj (D.func (expr "Math.pow") [| x; y |])
+
+  let random () = D.obj (D.func (expr "Math.random") [||])
+
+  let round x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.round") [| x |])
+
+  let sign x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.sign") [| x |])
+
+  let sin x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.sin") [| x |])
+
+  let sinh x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.sinh") [| x |])
+
+  let sqrt x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.sqrt") [| x |])
+
+  let tan x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.tan") [| x |])
+
+  let tanh x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.tanh") [| x |])
+
+  let trunc x =
+    let x = E.obj x in
+    D.obj (D.func (expr "Math.trunc") [| x |])
+end
