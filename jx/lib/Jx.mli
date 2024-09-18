@@ -367,15 +367,95 @@ val symbol : Stdlib.String.t -> symbol
 module Symbol : sig
   type t = symbol
 
-  val make : Stdlib.String.t -> t
+  val make : unit -> t
+  (** Create a
+      {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/Symbol}
+        Symbol} using [Symbol()]. *)
+
+  val with_description : Stdlib.String.t -> t
   (** Create a
       {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/Symbol}
         Symbol} with a description. *)
 
-  val empty : unit -> t
-  (** Create a
-      {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/Symbol}
-        Symbol} using [Symbol()]. *)
+  val for_key : Stdlib.String.t -> t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/for} [for] on
+        MDN}. *)
+
+  val key_for : t -> Stdlib.String.t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/keyFor}
+        [keyFor] on MDN}. *)
+
+  val has_instance : t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/hasInstance}
+        [hasInstance] on MDN}. *)
+
+  val is_concat_spreadable : t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/isConcatSpreadable}
+        [isConcatSpreadable] on MDN}. *)
+
+  val iterator : t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/iterator}
+        [iterator] on MDN}. *)
+
+  val match' : t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/match} [match]
+        on MDN}. *)
+
+  val match_all : t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/match}
+        [matchAll] on MDN}. *)
+
+  val replace : t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/replace}
+        [replace] on MDN}. *)
+
+  val search : t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/search}
+        [search] on MDN}. *)
+
+  val species : t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/species}
+        [species] on MDN}. *)
+
+  val split : t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/split} [split]
+        on MDN}. *)
+
+  val to_primitive : t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/toPrimitive}
+        [toPrimitive] on MDN}. *)
+
+  val to_string_tag : t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/toStringTag}
+        [toStringTag] on MDN}. *)
+
+  val unscopables : t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/unscopables}
+        [unscopables] on MDN}. *)
+
+  val to_string : t -> Stdlib.String.t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/toString}
+        [toString] on MDN}. *)
+
+  val value_of : t -> t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/valueOf}
+        [valueOf] on MDN}. *)
 end
 
 (** {2 Array} *)

@@ -91,6 +91,10 @@ let () =
   Jx.log (Jx.Math.abs (Jx.float (-4.3)));
   Jx.log (Jx.Math.max [| Jx.int 4; Jx.int 22; Jx.int 999; Jx.int (-23) |]);
 
+  Jx.log "Jx.Symbol";
+  Jx.log (Jx.Symbol.key_for (Jx.Symbol.for_key "sym1"));
+  Jx.log Jx.Symbol.(to_string iterator);
+
   let body =
     Document.query_selector ~selectors:"body" document |> Jx.Nullable.unsafe_get
   in

@@ -103,10 +103,27 @@ end
 module Symbol = struct
   type t = [ `Symbol ] Jx_ffi.obj
 
-  let make = Jx_ffi.symbol
+  let with_description = Jx_ffi.symbol
+  let make () = D.obj (D.func (expr "Symbol") [||])
+  let for_key key = D.obj (D.func (expr "Symbol.for") [| E.string key |])
+  let key_for sym = D.string (D.func (expr "Symbol.keyFor") [| E.obj sym |])
+  let has_instance = D.obj (D.func (expr "Symbol.hasInstance") [||])
 
-  let empty () =
-    Jx_ffi.Decode.obj (Jx_ffi.Decode.func (Jx_ffi.expr "Symbol") [||])
+  let is_concat_spreadable =
+    D.obj (D.func (expr "Symbol.isConcatSpreadable") [||])
+
+  let iterator = D.obj (D.func (expr "Symbol.iterator") [||])
+  let match' = D.obj (D.func (expr "Symbol.match") [||])
+  let match_all = D.obj (D.func (expr "Symbol.matchAll") [||])
+  let replace = D.obj (D.func (expr "Symbol.replace") [||])
+  let search = D.obj (D.func (expr "Symbol.search") [||])
+  let species = D.obj (D.func (expr "Symbol.species") [||])
+  let split = D.obj (D.func (expr "Symbol.split") [||])
+  let to_primitive = D.obj (D.func (expr "Symbol.toPrimitive") [||])
+  let to_string_tag = D.obj (D.func (expr "Symbol.toStringTag") [||])
+  let unscopables = D.obj (D.func (expr "Symbol.unscopables") [||])
+  let to_string sym = D.string (D.func (expr "Symbol.toString") [| E.obj sym |])
+  let value_of this = D.meth this "valueOf" [||]
 end
 
 (* Array *)
