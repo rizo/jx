@@ -23,7 +23,7 @@ let () =
   Jx.log (Some 1);
   Jx.log `hello;
 
-  Jx.log "-- Strings --";
+  Jx.log "-- String --";
   Jx.log (Jx.unicode "Olá, OCaml! 🐫");
   Jx.log (Jx.unicode ("Привіт знову!" ^ " 🐫"));
   let str_unicode_1' = Jx.unicode str_unicode_1 in
@@ -65,6 +65,21 @@ let () =
   Jx.log (Date.make_with_value ~value:(Jx.string "2024-04-12") ());
   Jx.log (Date.make_with_value ~value:(Jx.float 321321321.2) ());
   Jx.log (Date.make ());
+
+  Jx.log "Jx.Boolean";
+  let _ = Jx.Boolean.to_string (Jx.bool true) in
+
+  Jx.log "Jx.Number";
+  Jx.log Jx.Number.epsilon;
+  Jx.log Jx.Number.nan;
+  Jx.log Jx.Number.negative_infinity;
+  Jx.log (Jx.Number.is_integer (Jx.int 42));
+  Jx.log (Jx.Number.is_finite (Jx.float 3.14));
+  Jx.log (Jx.Number.is_nan Jx.Number.nan);
+  Jx.log (Jx.Number.parse_float "3.141592653589793");
+  Jx.log (Jx.Number.parse_int ~radix:10 "101");
+  Jx.log (Jx.Number.to_exponential ~fraction_digits:4 (Jx.float Float.pi));
+  Jx.log (Jx.Number.to_fixed ~fraction_digits:2 (Jx.float Float.pi));
 
   let body =
     Document.query_selector ~selectors:"body" document |> Jx.Nullable.unsafe_get

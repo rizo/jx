@@ -1255,7 +1255,13 @@
    }
    var null$0 = null;
    function log(x){console.log(x); return;}
-   var global = globalThis, t = Date, t$0 = Text;
+   var
+    global = globalThis,
+    epsilon = Number.EPSILON,
+    nan = Number.NaN,
+    negative_infinity = Number.NEGATIVE_INFINITY,
+    t = Date,
+    t$0 = Text;
    global["window"];
    var document$0 = document;
    function word_count(str){
@@ -1292,7 +1298,7 @@
    log(0);
    log([0, 1]);
    log(616641298);
-   log("-- Strings --");
+   log("-- String --");
    log("Olá, OCaml! 🐫");
    log
     (caml_jsstring_of_string
@@ -1326,6 +1332,20 @@
    log(new t("2024-04-12"));
    log(new t(321321321.2));
    log(new t);
+   log("Jx.Boolean");
+   var this$3 = ! ! 1;
+   this$3.toString();
+   log("Jx.Number");
+   log(epsilon);
+   log(nan);
+   log(negative_infinity);
+   log(Number.isInteger(42) | 0);
+   log(Number.isFinite(3.14) | 0);
+   log(Number.isNaN(nan) | 0);
+   log(Number.parseFloat("3.141592653589793"));
+   log(Number.parseInt("101", 10));
+   log((3.141592653589793).toExponential(4));
+   log((3.141592653589793).toFixed(2));
    var this$2 = document$0.querySelector("body");
    log("Default arg");
    document$0.importNode(this$2);

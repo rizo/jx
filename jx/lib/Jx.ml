@@ -1,3 +1,8 @@
+open struct
+  module E = Jx_ffi.Encode
+  module D = Jx_ffi.Decode
+end
+
 include Jx_ffi
 
 (* Object *)
@@ -15,6 +20,9 @@ module Boolean = struct
 
   external of_bool : Stdlib.Bool.t -> t = "caml_js_from_bool"
   external to_bool : t -> Stdlib.Bool.t = "caml_js_to_bool"
+
+  let to_string this = D.string (D.meth this "toString" [||])
+  let value_of this = D.bool (D.meth this "valueOf" [||])
 end
 
 (* Number *)
@@ -30,6 +38,55 @@ module Number = struct
   external to_int32 : t -> Int32.t = "caml_js_to_int32"
   external of_nativeint : nativeint -> t = "caml_js_from_nativeint"
   external to_nativeint : t -> nativeint = "caml_js_to_nativeint"
+
+  let is_finite num = D.bool (D.func (expr "Number.isFinite") [| E.obj num |])
+  let is_integer num = D.bool (D.func (expr "Number.isInteger") [| E.obj num |])
+  let is_nan num = D.bool (D.func (expr "Number.isNaN") [| E.obj num |])
+
+  let is_safe_integer num =
+    D.bool (D.func (expr "Number.isSafeInteger") [| E.obj num |])
+
+  let parse_float str =
+    D.obj (D.func (expr "Number.parseFloat") [| E.string str |])
+
+  let parse_int ~radix str =
+    D.obj (D.func (expr "Number.parseInt") [| E.string str; E.int radix |])
+
+  let epsilon = expr "Number.EPSILON"
+  let max_safe_integer = expr "Number.MAX_SAFE_INTEGER"
+  let max_value = expr "Number.MAX_VALUE"
+  let min_safe_integer = expr "Number.MIN_SAFE_INTEGER"
+  let min_value = expr "Number.MIN_VALUE"
+  let nan = expr "Number.NaN"
+  let negative_infinity = expr "Number.NEGATIVE_INFINITY"
+  let positive_infinity = expr "Number.POSITIVE_INFINITY"
+
+  let to_exponential ~fraction_digits this =
+    let fraction_digits = E.int fraction_digits in
+    D.string (D.meth this "toExponential" [| fraction_digits |])
+
+  let to_fixed ~fraction_digits this =
+    let fraction_digits = E.int fraction_digits in
+    D.string (D.meth this "toFixed" [| fraction_digits |])
+
+  let to_locale_string ~locales this =
+    let locales = E.obj locales in
+    D.string (D.meth this "toLocaleString" [| locales |])
+
+  let to_locale_string_with_options ~locales ~options this =
+    let locales = E.obj locales in
+    let options = E.obj options in
+    D.string (D.meth this "toLocaleString" [| locales; options |])
+
+  let to_precision ~precision this =
+    let precision = E.int precision in
+    D.string (D.meth this "toPrecision" [| precision |])
+
+  let to_string ~radix this =
+    let radix = E.int radix in
+    D.string (D.meth this "toString" [| radix |])
+
+  let value_of this = D.meth this "valueOf" [||]
 end
 
 (* String *)

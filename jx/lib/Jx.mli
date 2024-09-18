@@ -176,7 +176,14 @@ module Optional : sig
       ]} *)
 end
 
-(** {2 Boolean} *)
+(** {2 Boolean}
+
+    See
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean}
+      Boolean} on MDN.
+
+    See {{:https://tc39.es/ecma262/#sec-boolean-objects} Boolean Objects} in
+    ECMA262. *)
 
 type boolean = [ `Boolean ] obj
 
@@ -193,6 +200,16 @@ module Boolean : sig
   val false' : t
   external of_bool : Stdlib.Bool.t -> t = "caml_js_from_bool"
   external to_bool : t -> Stdlib.Bool.t = "caml_js_to_bool"
+
+  val to_string : t -> string
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Boolean/toString}
+        [Boolean.toString] on MDN}. *)
+
+  val value_of : t -> bool
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Boolean/valueOf}
+        [Boolean.valueOf] on MDN}. *)
 end
 
 (** {2 Number} *)
@@ -228,6 +245,91 @@ module Number : sig
   external to_int32 : t -> Int32.t = "caml_js_to_int32"
   external of_nativeint : nativeint -> t = "caml_js_from_nativeint"
   external to_nativeint : t -> nativeint = "caml_js_to_nativeint"
+
+  (** {2 Static methods} *)
+
+  val is_finite : t -> bool
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/isFinite}
+        [isFinite] on MDN}. *)
+
+  val is_integer : t -> bool
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/isInteger}
+        [isInteger] on MDN}. *)
+
+  val is_nan : t -> bool
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/isNaN} [isNaN]
+        on MDN}. *)
+
+  val is_safe_integer : t -> bool
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/isSafeInteger}
+        [isSafeInteger] on MDN}. *)
+
+  val parse_float : Stdlib.String.t -> t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/parseFloat}
+        [parseFloat] on MDN}. *)
+
+  val parse_int : radix:int -> string -> t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/parseInt}
+        [parseInt] on MDN}. *)
+
+  (** {2 Static properties} *)
+
+  val epsilon : t
+  val max_safe_integer : t
+  val max_value : t
+  val min_safe_integer : t
+  val min_value : t
+  val nan : t
+  val negative_infinity : t
+  val positive_infinity : t
+
+  (** {2 Instance methods} *)
+
+  val to_exponential : fraction_digits:int -> t -> Stdlib.String.t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/toExponential}
+        [toExponential] on MDN}. *)
+
+  val to_fixed : fraction_digits:int -> t -> Stdlib.String.t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/toFixed}
+        [toFixed] on MDN}. *)
+
+  val to_locale_string :
+    locales:[< `String | `Array of [ `String ] ] obj -> t -> Stdlib.String.t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/toLocaleString}
+        [toLocaleString] on MDN}. *)
+
+  val to_locale_string_with_options :
+    locales:[< `String | `Array of [ `String ] ] obj ->
+    options:any ->
+    t ->
+    Stdlib.String.t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/toLocaleString}
+        [toLocaleString] on MDN}. *)
+
+  val to_precision : precision:int -> t -> Stdlib.String.t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/toPrecision}
+        [toPrecision] on MDN}. *)
+
+  val to_string : radix:int -> t -> Stdlib.String.t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/toString}
+        [toString] on MDN}. *)
+
+  val value_of : t -> t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/valueOf}
+        [valueOf] on MDN}. *)
 end
 
 (** {2 String} *)
