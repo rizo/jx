@@ -49,7 +49,9 @@ module Number = struct
   let parse_float str =
     D.obj (D.func (expr "Number.parseFloat") [| E.string str |])
 
-  let parse_int ~radix str =
+  let parse_int str = D.obj (D.func (expr "Number.parseInt") [| E.string str |])
+
+  let parse_int_with_radix ~radix str =
     D.obj (D.func (expr "Number.parseInt") [| E.string str; E.int radix |])
 
   let epsilon = expr "Number.EPSILON"
@@ -296,4 +298,19 @@ module Math = struct
   let trunc x =
     let x = E.obj x in
     D.obj (D.func (expr "Math.trunc") [| x |])
+end
+
+module Func = struct
+  type t = func
+
+  let make args = obj_new (expr "Function") (E.Array.any args)
+  let apply ~this ~args func = D.meth func "apply" [| E.obj this; E.obj args |]
+
+  let bind ~this ~args func =
+    D.obj (D.meth func "bind" [| E.obj this; E.obj args |])
+
+  let call ~this ~args func = D.meth func "call" [| E.obj this; E.obj args |]
+  let to_string this = D.string (D.meth this "toString" [||])
+  let length this = D.int (D.meth this "length" [||])
+  let name this = D.string (D.meth this "name" [||])
 end

@@ -1152,6 +1152,8 @@
     cst_Sys_blocked_io = "Sys_blocked_io",
     cst_Sys_error = "Sys_error",
     cst_Undefined_recursive_module = "Undefined_recursive_module",
+    cst_a = "a",
+    cst_b = "b",
     cst_button = "button";
    function caml_call1(f, a0){
     return (f.l >= 0 ? f.l : f.l = f.length) == 1
@@ -1259,9 +1261,22 @@
     global = globalThis,
     epsilon = Number.EPSILON,
     nan = Number.NaN,
-    negative_infinity = Number.NEGATIVE_INFINITY,
-    t = Date,
-    t$0 = Text;
+    negative_infinity = Number.NEGATIVE_INFINITY;
+   Symbol.hasInstance();
+   Symbol.isConcatSpreadable();
+   var iterator = Symbol.iterator();
+   Symbol.match();
+   Symbol.matchAll();
+   Symbol.replace();
+   Symbol.search();
+   Symbol.species();
+   Symbol.split();
+   Symbol.toPrimitive();
+   Symbol.toStringTag();
+   Symbol.unscopables();
+   var e = Math.E, ln2 = Math.LN2, pi = Math.PI, sqrt2 = Math.SQRT2;
+   function abs(x){return Math.abs(x);}
+   var t = Date, t$0 = Text;
    global["window"];
    var document$0 = document;
    function word_count(str){
@@ -1344,8 +1359,24 @@
    log(Number.isNaN(nan) | 0);
    log(Number.parseFloat("3.141592653589793"));
    log(Number.parseInt("101", 10));
+   log(Number.parseInt("102"));
    log((3.141592653589793).toExponential(4));
    log((3.141592653589793).toFixed(2));
+   log("Jx.Math");
+   log(e);
+   log(ln2);
+   log(pi);
+   log(sqrt2);
+   log(Math.random());
+   log(abs(4));
+   log(abs(-4.3));
+   log(Math.max(4, 22, 999, -23));
+   log("Jx.Symbol");
+   var sym = Symbol.for("sym1");
+   log(Symbol.keyFor(sym));
+   log(Symbol.toString(iterator));
+   log("Jx.Func");
+   log(new Function(cst_a, cst_b, "a + b"));
    var this$2 = document$0.querySelector("body");
    log("Default arg");
    document$0.importNode(this$2);

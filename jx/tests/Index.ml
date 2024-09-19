@@ -77,7 +77,8 @@ let () =
   Jx.log (Jx.Number.is_finite (Jx.float 3.14));
   Jx.log (Jx.Number.is_nan Jx.Number.nan);
   Jx.log (Jx.Number.parse_float "3.141592653589793");
-  Jx.log (Jx.Number.parse_int ~radix:10 "101");
+  Jx.log (Jx.Number.parse_int_with_radix ~radix:10 "101");
+  Jx.log (Jx.Number.parse_int "102");
   Jx.log (Jx.Number.to_exponential ~fraction_digits:4 (Jx.float Float.pi));
   Jx.log (Jx.Number.to_fixed ~fraction_digits:2 (Jx.float Float.pi));
 
@@ -94,6 +95,9 @@ let () =
   Jx.log "Jx.Symbol";
   Jx.log (Jx.Symbol.key_for (Jx.Symbol.for_key "sym1"));
   Jx.log Jx.Symbol.(to_string iterator);
+
+  Jx.log "Jx.Func";
+  Jx.log (Jx.Func.make [| "a"; "b"; "a + b" |]);
 
   let body =
     Document.query_selector ~selectors:"body" document |> Jx.Nullable.unsafe_get

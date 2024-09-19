@@ -351,3 +351,7 @@ type 'a promise = [ `Promise of 'a ] obj
 (* BigInt *)
 
 type bigint = [ `Bigint ] obj
+
+(* Function *)
+
+type func = [ `Func ] obj

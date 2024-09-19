@@ -273,7 +273,12 @@ module Number : sig
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/parseFloat}
         [parseFloat] on MDN}. *)
 
-  val parse_int : radix:int -> string -> t
+  val parse_int : string -> t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/parseInt}
+        [parseInt] on MDN}. *)
+
+  val parse_int_with_radix : radix:int -> string -> t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/parseInt}
         [parseInt] on MDN}. *)
@@ -500,6 +505,49 @@ type bigint = [ `Bigint ] obj
 (** The JavaScript
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt}
       BigInt} type. *)
+
+(** {2 Function} *)
+
+type func = [ `Func ] obj
+(** The JavaScript
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function}
+      Function} type. *)
+
+module Func : sig
+  type t = func
+
+  val make : Stdlib.String.t Stdlib.Array.t -> t
+
+  val apply : this:'a obj -> args:any array -> t -> any
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/apply}
+        [apply] on MDN}. *)
+
+  val bind : this:'a obj -> args:any array -> t -> t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/bind} [bind]
+        on MDN}. *)
+
+  val call : this:'a obj -> args:any array -> t -> any
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/call} [call]
+        on MDN}. *)
+
+  val to_string : t -> Stdlib.String.t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/toString}
+        [toString] on MDN}. *)
+
+  val length : t -> int
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/length}
+        [length] on MDN}. *)
+
+  val name : t -> Stdlib.String.t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/name} [name]
+        on MDN}. *)
+end
 
 (** {1 Unicode}
 
