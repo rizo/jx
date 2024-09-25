@@ -470,7 +470,8 @@ type +'a array = [ `Array of 'a ] obj
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array}
       Array} type. *)
 
-external array : 'a Stdlib.Array.t -> 'a array = "caml_js_from_array"
+(* external array : 'a Stdlib.Array.t -> 'a array = "caml_js_from_array" *)
+val array : 'a Stdlib.Array.t -> 'a array
 (** Create a JavaScript Array from an OCaml array. *)
 
 external list : 'a Stdlib.List.t -> 'a array = "caml_list_to_js_array"
@@ -547,6 +548,37 @@ module Func : sig
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/name} [name]
         on MDN}. *)
+end
+
+(** {2 Iterator} *)
+
+type 'a iterator = [ `Iterator of 'a ] obj
+(** The JavaScript
+    {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator}
+      Iterator} type. *)
+
+module Iterator : sig
+  type 'a t = 'a iterator
+
+  val make : unit -> 'a t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/Iterator}
+        [Iterator] on MDN}. *)
+
+  val from : _ obj -> 'a t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/from}
+        [from] on MDN}. *)
+
+  val drop : int -> 'a t -> 'a t
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/drop}
+        [drop] on MDN}. *)
+
+  val every : ('a -> int -> bool) -> 'a t -> bool
+  (** See
+      {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/drop}
+        [drop] on MDN}. *)
 end
 
 (** {1 Unicode}

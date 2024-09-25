@@ -868,6 +868,30 @@
     console.error("caml_js_expr: fallback to runtime evaluation\n");
     return eval(caml_jsstring_of_string(s));
    }
+   function caml_js_from_array(a){return a.slice(1);}
+   function caml_js_new(c, a){
+    switch(a.length){
+      case 1:
+       return new c;
+      case 2:
+       return new c(a[1]);
+      case 3:
+       return new c(a[1], a[2]);
+      case 4:
+       return new c(a[1], a[2], a[3]);
+      case 5:
+       return new c(a[1], a[2], a[3], a[4]);
+      case 6:
+       return new c(a[1], a[2], a[3], a[4], a[5]);
+      case 7:
+       return new c(a[1], a[2], a[3], a[4], a[5], a[6]);
+      case 8:
+       return new c(a[1], a[2], a[3], a[4], a[5], a[6], a[7]);
+    }
+    function F(){return c.apply(this, caml_js_from_array(a));}
+    F.prototype = c.prototype;
+    return new F;
+   }
    var caml_ml_channels = new Array();
    function caml_ml_channel_get(id){return caml_ml_channels[id];}
    function caml_ml_flush(chanid){
@@ -1257,8 +1281,9 @@
    }
    var null$0 = null;
    function log(x){console.log(x); return;}
+   var global = globalThis;
+   function array(values){return caml_js_new(Array, values);}
    var
-    global = globalThis,
     epsilon = Number.EPSILON,
     nan = Number.NaN,
     negative_infinity = Number.NEGATIVE_INFINITY;
@@ -1348,8 +1373,8 @@
    log(new t(321321321.2));
    log(new t);
    log("Jx.Boolean");
-   var this$3 = ! ! 1;
-   this$3.toString();
+   var this$4 = ! ! 1;
+   this$4.toString();
    log("Jx.Number");
    log(epsilon);
    log(nan);
@@ -1376,19 +1401,25 @@
    log(Symbol.keyFor(sym));
    log(Symbol.toString(iterator));
    log("Jx.Func");
-   log(new Function(cst_a, cst_b, "a + b"));
-   var this$2 = document$0.querySelector("body");
+   var func1 = new Function(cst_a, cst_b, "a + b");
+   log(func1);
+   var args = array([0, 2, 3]);
+   log(func1.apply(null$0, args));
+   log("Jx.Iterator");
+   var obj$0 = array([0, 1, 2, 3]), this$0 = Iterator.from(obj$0);
+   log(this$0.drop(5));
+   var this$3 = document$0.querySelector("body");
    log("Default arg");
-   document$0.importNode(this$2);
+   document$0.importNode(this$3);
    var deep = ! ! 1;
-   document$0.importNode(this$2, deep);
-   var this$0 = {};
-   this$0["composed"] = ! ! 1;
-   log(this$0);
+   document$0.importNode(this$3, deep);
+   var this$1 = {};
+   this$1["composed"] = ! ! 1;
+   log(this$1);
    var
-    this$1 = document$0.createElement(cst_button),
+    this$2 = document$0.createElement(cst_button),
     incr_txt = document$0.createTextNode("Incr ➕");
-   this$1.appendChild(incr_txt);
+   this$2.appendChild(incr_txt);
    var
     decr = document$0.createElement(cst_button, cst_button),
     decr_txt = new t$0("Decr");
@@ -1397,7 +1428,7 @@
     reset = document$0.createElement(cst_button),
     reset_txt = document$0.createTextNode("Reset");
    reset.appendChild(reset_txt);
-   this$2.append(this$1, decr, reset);
+   this$3.append(this$2, decr, reset);
    log(document$0["children"]);
    do_at_exit(undef);
    return;

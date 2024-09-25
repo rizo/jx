@@ -97,7 +97,17 @@ let () =
   Jx.log Jx.Symbol.(to_string iterator);
 
   Jx.log "Jx.Func";
-  Jx.log (Jx.Func.make [| "a"; "b"; "a + b" |]);
+  let func1 = Jx.Func.make [| "a"; "b"; "a + b" |] in
+  Jx.log func1;
+  Jx.log
+    (Jx.Func.apply ~this:Jx.null
+       ~args:(Jx.array [| Jx.Encode.int 2; Jx.Encode.int 3 |])
+       func1);
+
+  Jx.log "Jx.Iterator";
+  let it1 = Jx.Iterator.from (Jx.array [| 1; 2; 3 |]) in
+  Jx.log (Jx.Iterator.drop 5 it1);
+  Jx.log (Jx.Iterator.every (fun _ _ -> true) it1);
 
   let body =
     Document.query_selector ~selectors:"body" document |> Jx.Nullable.unsafe_get

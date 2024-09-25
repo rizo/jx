@@ -109,21 +109,18 @@ module Symbol = struct
   let make () = D.obj (D.func (expr "Symbol") [||])
   let for_key key = D.obj (D.func (expr "Symbol.for") [| E.string key |])
   let key_for sym = D.string (D.func (expr "Symbol.keyFor") [| E.obj sym |])
-  let has_instance = D.obj (D.func (expr "Symbol.hasInstance") [||])
-
-  let is_concat_spreadable =
-    D.obj (D.func (expr "Symbol.isConcatSpreadable") [||])
-
-  let iterator = D.obj (D.func (expr "Symbol.iterator") [||])
-  let match' = D.obj (D.func (expr "Symbol.match") [||])
-  let match_all = D.obj (D.func (expr "Symbol.matchAll") [||])
-  let replace = D.obj (D.func (expr "Symbol.replace") [||])
-  let search = D.obj (D.func (expr "Symbol.search") [||])
-  let species = D.obj (D.func (expr "Symbol.species") [||])
-  let split = D.obj (D.func (expr "Symbol.split") [||])
-  let to_primitive = D.obj (D.func (expr "Symbol.toPrimitive") [||])
-  let to_string_tag = D.obj (D.func (expr "Symbol.toStringTag") [||])
-  let unscopables = D.obj (D.func (expr "Symbol.unscopables") [||])
+  let has_instance = expr "Symbol.hasInstance"
+  let is_concat_spreadable = expr "Symbol.isConcatSpreadable"
+  let iterator = expr "Symbol.iterator"
+  let match' = expr "Symbol.match"
+  let match_all = expr "Symbol.matchAll"
+  let replace = expr "Symbol.replace"
+  let search = expr "Symbol.search"
+  let species = expr "Symbol.species"
+  let split = expr "Symbol.split"
+  let to_primitive = expr "Symbol.toPrimitive"
+  let to_string_tag = expr "Symbol.toStringTag"
+  let unscopables = expr "Symbol.unscopables"
   let to_string sym = D.string (D.func (expr "Symbol.toString") [| E.obj sym |])
   let value_of this = D.meth this "valueOf" [||]
 end
@@ -313,4 +310,16 @@ module Func = struct
   let to_string this = D.string (D.meth this "toString" [||])
   let length this = D.int (D.meth this "length" [||])
   let name this = D.string (D.meth this "name" [||])
+end
+
+module Iterator = struct
+  type 'a t = 'a iterator
+
+  let make () = obj_new (expr "Iterator") [||]
+  let from obj = D.obj (D.func (expr "Iterator.from") [| E.obj obj |])
+  let drop limit this = D.obj (D.meth this "drop" [| E.int limit |])
+
+  let every callback_fn this =
+    let callback_fn = E.func 2 callback_fn in
+    D.bool (D.meth this "every" [| callback_fn |])
 end

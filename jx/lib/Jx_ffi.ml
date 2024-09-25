@@ -331,7 +331,10 @@ let symbol str : symbol =
 
 type +'a array = [ `Array of 'a ] obj
 
-external array : 'a Stdlib.Array.t -> 'a array = "caml_js_from_array"
+(* external array : 'a Stdlib.Array.t -> 'a array = "caml_js_from_array" *)
+
+let array values = obj_new (expr "Array") (Encode.Array.any values)
+
 external list : 'a Stdlib.List.t -> 'a array = "caml_list_to_js_array"
 
 (* Function *)
@@ -355,3 +358,7 @@ type bigint = [ `Bigint ] obj
 (* Function *)
 
 type func = [ `Func ] obj
+
+(* Iterator *)
+
+type 'a iterator = [ `Iterator of 'a ] obj
