@@ -1294,26 +1294,18 @@
     }
    }
    var null$0 = null;
-   function log(x){console.log(x); return;}
+   function log(x){console.log(x);}
    var global = globalThis;
    function array(values){return caml_js_new(Array, values);}
    var
     epsilon = Number.EPSILON,
     nan = Number.NaN,
-    negative_infinity = Number.NEGATIVE_INFINITY;
-   Symbol.hasInstance();
-   Symbol.isConcatSpreadable();
-   var iterator = Symbol.iterator();
-   Symbol.match();
-   Symbol.matchAll();
-   Symbol.replace();
-   Symbol.search();
-   Symbol.species();
-   Symbol.split();
-   Symbol.toPrimitive();
-   Symbol.toStringTag();
-   Symbol.unscopables();
-   var e = Math.E, ln2 = Math.LN2, pi = Math.PI, sqrt2 = Math.SQRT2;
+    negative_infinity = Number.NEGATIVE_INFINITY,
+    iterator = Symbol.iterator,
+    e = Math.E,
+    ln2 = Math.LN2,
+    pi = Math.PI,
+    sqrt2 = Math.SQRT2;
    function abs(x){return Math.abs(x);}
    var t = Date, t$0 = Text;
    global["window"];
