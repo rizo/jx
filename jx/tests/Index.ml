@@ -57,7 +57,7 @@ let () =
   let _optimized_away = Jx.expr {|2 + 2|} in
   Jx.log (Jx.expr {|2 > 1 ? "static expr" : "no"|});
   Jx.exec "console.log('raw expr')";
-  Jx.exec ("console.log" ^ "('raw expr 2')");
+  Jx.exec ("console.log" ^ "('fallback raw expr')");
   Jx.log (Jx.Decode.int (Jx.expr "2 + 2") = 4);
 
   Jx.log word_count;

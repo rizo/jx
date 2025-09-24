@@ -217,8 +217,6 @@ module Encode = struct
   let dict ml_to_any fields =
     obj_dict (Stdlib.Array.map (fun (prop, v) -> (prop, ml_to_any v)) fields)
 
-  (* let field obj prop ml_to_any ml_val = set obj prop (ml_to_any ml_val) *)
-
   module Array = struct
     external any : 'a Stdlib.Array.t -> any Stdlib.Array.t = "%identity"
     external obj : 'a obj Stdlib.Array.t -> any Stdlib.Array.t = "%identity"
