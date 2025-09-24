@@ -83,10 +83,10 @@ external nullable : 'a -> 'a Nullable.t = "%identity"
 let null = Nullable.null
 let is_null = Nullable.is_null
 
-(** {2 Optional} *)
+(** {2 Undefined} *)
 
-module Optional = struct
-  type +'a t = [ `Optional of 'a ] obj
+module Undefined = struct
+  type +'a t = [ `Undefined of 'a ] obj
 
   let undefined = expr "undefined"
 
@@ -112,7 +112,7 @@ module Optional = struct
     if is_undefined this then None else Some (unsafe_get this)
 
   let get this =
-    if is_undefined this then failwith "Optional.get" else unsafe_get this
+    if is_undefined this then failwith "Undefined.get" else unsafe_get this
 
   let map f this =
     if is_undefined this then undefined else defined (f (unsafe_get this))
@@ -124,14 +124,14 @@ module Optional = struct
     if is_undefined this then get_default () else f (unsafe_get this)
 end
 
-type +'a optional = 'a Optional.t
+type +'a undefined = 'a Undefined.t
 
-let undefined = Optional.undefined
+let undefined = Undefined.undefined
 
-external defined : 'a -> 'a Optional.t = "%identity"
+external defined : 'a -> 'a Undefined.t = "%identity"
 
-let is_undefined = Optional.is_undefined
-let is_defined = Optional.is_defined
+let is_undefined = Undefined.is_undefined
+let is_defined = Undefined.is_defined
 
 (** {2 Conversion} *)
 
@@ -184,16 +184,16 @@ module Encode = struct
     | None -> null
     | Some x -> encode x
 
-  (* optional *)
+  (* undefined *)
 
-  external any_optional : 'a option -> any = "%identity"
+  external any_undefined : 'a option -> any = "%identity"
 
-  let obj_optional opt =
+  let obj_undefined opt =
     match opt with
     | None -> undefined
     | Some x -> obj x
 
-  let optional encode opt =
+  let undefined encode opt =
     match opt with
     | None -> undefined
     | Some x -> encode x
@@ -261,9 +261,9 @@ module Decode = struct
 
   (* undefined *)
 
-  let optional decode js = if is_undefined js then None else Some (decode js)
+  let undefined decode js = if is_undefined js then None else Some (decode js)
 
-  let obj_optional any =
+  let obj_undefined any =
     let any_obj = obj any in
     if is_undefined any_obj then None else Some any_obj
 

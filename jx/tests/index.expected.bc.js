@@ -16180,7 +16180,7 @@ cA="caml_unix_stat_64",cz="unix_lseek",l="caml_unix_inchannel_of_filedescr",cy="
        map_or,
        map_or_else],
     undefined$ = undefined,
-    cst_Optional_get = "Optional.get";
+    cst_Undefined_get = "Undefined.get";
    function is_undefined(this$){return this$ === undefined$ ? 1 : 0;}
    function is_defined(this$){return 1 - (this$ === undefined$ ? 1 : 0);}
    function of_any$0(x_of_any, this$){
@@ -16197,7 +16197,7 @@ cA="caml_unix_stat_64",cz="unix_lseek",l="caml_unix_inchannel_of_filedescr",cy="
    function to_option$0(this$){return this$ === undefined$ ? 0 : [0, this$];}
    function get$0(this$){
     return this$ === undefined$
-            ? Stdlib[2].call(null, cst_Optional_get)
+            ? Stdlib[2].call(null, cst_Undefined_get)
             : this$;
    }
    function map$0(f, this$){
@@ -16212,7 +16212,7 @@ cA="caml_unix_stat_64",cz="unix_lseek",l="caml_unix_inchannel_of_filedescr",cy="
             : caml_call1(f, this$);
    }
    var
-    Optional =
+    Undefined =
       [0,
        undefined$,
        is_undefined,
@@ -16244,12 +16244,12 @@ cA="caml_unix_stat_64",cz="unix_lseek",l="caml_unix_inchannel_of_filedescr",cy="
     var x = opt[1];
     return caml_call1(encode, x);
    }
-   function obj_optional(opt){
+   function obj_undefined(opt){
     if(! opt) return undefined$;
     var x = opt[1];
     return x;
    }
-   function optional(encode, opt){
+   function undefined$0(encode, opt){
     if(! opt) return undefined$;
     var x = opt[1];
     return caml_call1(encode, x);
@@ -16276,8 +16276,8 @@ cA="caml_unix_stat_64",cz="unix_lseek",l="caml_unix_inchannel_of_filedescr",cy="
        list,
        obj_nullable,
        nullable,
-       obj_optional,
-       optional,
+       obj_undefined,
+       undefined$0,
        field,
        dict,
        Array$0];
@@ -16293,10 +16293,10 @@ cA="caml_unix_stat_64",cz="unix_lseek",l="caml_unix_inchannel_of_filedescr",cy="
     return this$ === null$ ? 0 : [0, caml_call1(decode, this$)];
    }
    function obj_nullable$0(this$){return this$ === null$ ? 0 : [0, this$];}
-   function optional$0(decode, this$){
+   function undefined$1(decode, this$){
     return this$ === undefined$ ? 0 : [0, caml_call1(decode, this$)];
    }
-   function obj_optional$0(this$){
+   function obj_undefined$0(this$){
     return this$ === undefined$ ? 0 : [0, this$];
    }
    function field$0(obj, prop, any_to_ml){
@@ -16310,8 +16310,8 @@ cA="caml_unix_stat_64",cz="unix_lseek",l="caml_unix_inchannel_of_filedescr",cy="
        list$0,
        nullable$0,
        obj_nullable$0,
-       optional$0,
-       obj_optional$0,
+       undefined$1,
+       obj_undefined$0,
        field$0];
    function debug(x){console.debug(x); return 0;}
    function log(x){console.log(x); return 0;}
@@ -16324,7 +16324,7 @@ cA="caml_unix_stat_64",cz="unix_lseek",l="caml_unix_inchannel_of_filedescr",cy="
        Nullable,
        null$,
        is_null,
-       Optional,
+       Undefined,
        undefined$,
        is_undefined,
        is_defined,
@@ -16355,7 +16355,7 @@ cA="caml_unix_stat_64",cz="unix_lseek",l="caml_unix_inchannel_of_filedescr",cy="
     Nullable = Jx_Jx_ffi[1],
     null$ = Jx_Jx_ffi[2],
     is_null = Jx_Jx_ffi[3],
-    Optional = Jx_Jx_ffi[4],
+    Undefined = Jx_Jx_ffi[4],
     undefined$ = Jx_Jx_ffi[5],
     is_undefined = Jx_Jx_ffi[6],
     is_defined = Jx_Jx_ffi[7],
@@ -16579,14 +16579,14 @@ cA="caml_unix_stat_64",cz="unix_lseek",l="caml_unix_inchannel_of_filedescr",cy="
        is_undefined,
        is_defined,
        [0,
-        Optional[4],
-        Optional[5],
-        Optional[6],
-        Optional[7],
-        Optional[8],
-        Optional[9],
-        Optional[10],
-        Optional[11]],
+        Undefined[4],
+        Undefined[5],
+        Undefined[6],
+        Undefined[7],
+        Undefined[8],
+        Undefined[9],
+        Undefined[10],
+        Undefined[11]],
        true$,
        false$,
        Boolean,
@@ -16650,7 +16650,6 @@ cA="caml_unix_stat_64",cz="unix_lseek",l="caml_unix_inchannel_of_filedescr",cy="
     cst_cancelBubble$1 = "cancelBubble",
     cst_cancelable$2 = "cancelable",
     cst_composed$2 = "composed",
-    cst_returnValue$1 = "returnValue",
     caml_js_from_bool = runtime.caml_js_from_bool,
     caml_js_to_bool = runtime.caml_js_to_bool;
    function caml_call2(f, a0, a1){
@@ -16746,9 +16745,6 @@ cA="caml_unix_stat_64",cz="unix_lseek",l="caml_unix_inchannel_of_filedescr",cy="
     cst_cancelBubble$0 = cst_cancelBubble$1,
     cst_bubbles$1 = cst_bubbles$2,
     cst_cancelable$1 = cst_cancelable$2,
-    cst_returnValue = cst_returnValue$1,
-    cst_returnValue$0 = cst_returnValue$1,
-    cst_defaultPrevented = "defaultPrevented",
     cst_composed$1 = cst_composed$2,
     cst_isTrusted = "isTrusted",
     cst_timeStamp = "timeStamp";
@@ -16776,20 +16772,13 @@ cA="caml_unix_stat_64",cz="unix_lseek",l="caml_unix_inchannel_of_filedescr",cy="
    function cancelable$0(this$){
     return Jx[25][8].call(null, this$, cst_cancelable$1, caml_js_to_bool);
    }
-   function return_value(this$){
-    return Jx[25][8].call(null, this$, cst_returnValue, caml_js_to_bool);
-   }
-   function set_return_value(this$, x){
-    return caml_call4
-            (Jx[24][10], this$, cst_returnValue$0, caml_js_from_bool, x);
-   }
+   function return_value(this$){return this$.returnValue | 0;}
+   function set_return_value(this$, x){return this$.returnValue = ! ! x;}
    function prevent_default(this$){
     var a = this$.preventDefault();
     return Jx[25][1].call(null, a);
    }
-   function default_prevented(this$){
-    return Jx[25][8].call(null, this$, cst_defaultPrevented, caml_js_to_bool);
-   }
+   function default_prevented(this$){return this$.defaultPrevented | 0;}
    function composed$0(this$){
     return Jx[25][8].call(null, this$, cst_composed$1, caml_js_to_bool);
    }
@@ -17055,7 +17044,7 @@ cA="caml_unix_stat_64",cz="unix_lseek",l="caml_unix_inchannel_of_filedescr",cy="
    Jx[27].call(null, "-- Embed JavaScript --");
    Jx[27].call(null, 2 > 1 ? "static expr" : "no");
    console.log("raw expr");
-   caml_js_expr(Stdlib[28].call(null, "console.log", "('raw expr 2')"));
+   caml_js_expr(Stdlib[28].call(null, "console.log", "('fallback raw expr')"));
    Jx[27].call(null, 4 === 2 + 2 ? 1 : 0);
    Jx[27].call(null, Js_lib[17]);
    var b = Js_lib[17].call(null, str_ascii_1);
@@ -17151,6 +17140,8 @@ cA="caml_unix_stat_64",cz="unix_lseek",l="caml_unix_inchannel_of_filedescr",cy="
    Jx[27].call(null, global_f);
    Jx[27].call(null, runtime.caml_js_wrap_callback_strict(3, global_f));
    Jx[27].call(null, Stdlib_List[18]);
+   Jx[27].call(null, Js_lib[4][22]);
+   Jx[27].call(null, Js_lib[4][20]);
    var Dune_exe_Index = [0];
    runtime.caml_register_global(61, Dune_exe_Index, "Dune__exe__Index");
    return;

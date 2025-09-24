@@ -185,6 +185,9 @@ let () =
   Jx.log (Jx.Encode.func 3 global_f);
   Jx.log List.iter;
 
+  Jx.log Js_lib.Event.default_prevented;
+  Jx.log Js_lib.Event.set_return_value;
+
   (* Jx.log "Jx.Iterator"; *)
   (* let it1 = Jx.Iterator.from (Jx.array [| 1; 2; 3 |]) in *)
   (* Jx.log (Jx.Iterator.drop 5 it1); *)

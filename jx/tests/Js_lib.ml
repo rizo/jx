@@ -173,10 +173,10 @@ end = struct
 
   let bubbles this = D.field this "bubbles" D.bool
   let cancelable this = D.field this "cancelable" D.bool
-  let return_value this = D.field this "returnValue" D.bool
-  let set_return_value this x = E.field this "returnValue" E.bool x
+  let return_value this = D.bool (Jx.get this "returnValue")
+  let set_return_value this x = Jx.set this "returnValue" (E.bool x)
   let prevent_default this = D.unit (D.meth this "preventDefault" [||])
-  let default_prevented this = D.field this "defaultPrevented" D.bool
+  let default_prevented this = D.bool (Jx.get this "defaultPrevented")
   let composed this = D.field this "composed" D.bool
   let is_trusted this = D.field this "isTrusted" D.bool
   let time_stamp this = D.field this "timeStamp" dom_high_res_time_stamp_of_any
