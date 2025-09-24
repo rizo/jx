@@ -1,4 +1,16 @@
-(lang dune 3.14)
+(lang dune 3.17)
 
 (env
-  (dev (flags (:standard -warn-error -A))))
+ (dev
+  (flags
+   (:standard -warn-error -A))
+  (js_of_ocaml
+   (flags
+    --pretty
+    --effects=disabled
+    --target-env=browser
+    --no-sourcemap
+    --opt=3
+    --no-extern-fs)
+   (link_flags)
+   (sourcemap no))))

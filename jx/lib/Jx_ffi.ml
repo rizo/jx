@@ -7,7 +7,7 @@ type any = [ `Any ] obj
 type prop = Stdlib.String.t
 
 external expr : Stdlib.String.t -> 'c obj = "caml_pure_js_expr"
-external stmt : Stdlib.String.t -> unit = "caml_js_expr"
+external exec : Stdlib.String.t -> unit = "caml_js_expr"
 external any : 'c obj -> any = "%identity"
 
 (** {2 Unicode} *)
@@ -153,6 +153,7 @@ module Encode = struct
 
   (* string *)
   external unicode : Stdlib.String.t -> any = "caml_jsstring_of_string"
+  external ascii : Stdlib.String.t -> any = "%identity"
   external string : Stdlib.String.t -> any = "%identity"
 
   (* array *)

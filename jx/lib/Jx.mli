@@ -29,20 +29,21 @@ type +'c obj constraint 'c = [> ]
 
     For example, the JavaScript
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date}
-      Date} class can be represented as: [[ `Date ] Js.obj]. *)
+     Date} class can be represented as: [[ `Date ] Js.obj]. *)
 
 type any = [ `Any ] obj
-(** Opaque JavaScript objects.
+(** JavaScript objects of an unknown type.
 
-    The [any] type is used to represent arbitrary JavaScript values whose static
-    type information is unknown. This is useful for interfacing with low-level
-    JavaScript APIs.
+    The [any] type is used to represent arbitrary, opaque JavaScript values
+    whose static type information is unknown. This type useful for interfacing
+    with low-level JavaScript APIs.
 
-    The JavaScript {!type:any} values can be converted to and from OCaml values
-    using the {!module:Encode} and {!module:Decode} modules. *)
+    The {!type:any} values can be converted to and from OCaml values using the
+    {!module:Encode} and {!module:Decode} modules. See {!section:bindings} for
+    more details. *)
 
 type prop = string
-(** JavaScript object property names.
+(** An alias type for object property names.
 
     {e Note:} Properties names with non-ASCII characters require transcoding
     (see {!section:unicode}). *)
@@ -60,36 +61,42 @@ external obj_new : 'c obj -> any Stdlib.Array.t -> 'a obj = "caml_js_new"
 external typeof : 'c obj -> Stdlib.String.t = "caml_js_typeof"
 (** See
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof}
-      typeof}. *)
+     typeof}. *)
 
 external instanceof : 'c obj -> constr:'constr obj -> bool
   = "caml_js_instanceof"
 (** See
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/instanceof}
-      instanceof}. *)
+     instanceof}. *)
 
 external equal : 'c obj -> 'c obj -> bool = "caml_js_equals"
 (** See
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Equality}
-      Equality (==)}. *)
+     Equality (==)}. *)
 
 external strict_equal : 'c obj -> 'c obj -> bool = "caml_js_strict_equals"
 (** See
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality}
-      Strict equality (===)}. *)
+     Strict equality (===)}. *)
 
 (** The JavaScript
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object}
-      Object} class. *)
+     Object} class. *)
 module Object : sig
   type 'a t = 'a obj
 end
 
-(** {2 Dict} *)
+(** {2 Dict}
+
+    JavaScript objects with values of the same type.
+
+    {@ocaml[
+      Jx.log (Jx.dict [| ("k1", 101); ("k2", 102); ("k3", 103) |])
+      (* { "k1": 101, "k2": 102, "k3": 103 } *)
+    ]} *)
 
 type +'a dict = [ `Dict of 'a ] obj
-(** The type for JavaScript objects that act as containers for values of the
-    same type. *)
+(** The type for JavaScript dictionaries. *)
 
 external dict : (prop * 'a) Stdlib.Array.t -> 'a dict = "caml_js_object"
 (** An object with homogeneous value types. *)
@@ -180,7 +187,7 @@ end
 
     See
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean}
-      Boolean} on MDN.
+     Boolean} on MDN.
 
     See {{:https://tc39.es/ecma262/#sec-boolean-objects} Boolean Objects} in
     ECMA262. *)
@@ -204,12 +211,12 @@ module Boolean : sig
   val to_string : t -> string
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Boolean/toString}
-        [Boolean.toString] on MDN}. *)
+       [Boolean.toString] on MDN}. *)
 
   val value_of : t -> bool
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Boolean/valueOf}
-        [Boolean.valueOf] on MDN}. *)
+       [Boolean.valueOf] on MDN}. *)
 end
 
 (** {2 Number} *)
@@ -217,7 +224,7 @@ end
 type number = [ `Number ] obj
 (** The JavaScript
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number}
-      Number} type. *)
+     Number} type. *)
 
 external int : Stdlib.Int.t -> number = "%identity"
 (** Create a JavaScript {!type:number} from an OCaml int. *)
@@ -233,7 +240,7 @@ external nativeint : Stdlib.Nativeint.t -> number = "caml_js_from_nativeint"
 
 (** The JavaScript
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number}
-      Number} class. *)
+     Number} class. *)
 module Number : sig
   type t = number
 
@@ -251,37 +258,37 @@ module Number : sig
   val is_finite : t -> bool
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/isFinite}
-        [isFinite] on MDN}. *)
+       [isFinite] on MDN}. *)
 
   val is_integer : t -> bool
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/isInteger}
-        [isInteger] on MDN}. *)
+       [isInteger] on MDN}. *)
 
   val is_nan : t -> bool
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/isNaN} [isNaN]
-        on MDN}. *)
+       on MDN}. *)
 
   val is_safe_integer : t -> bool
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/isSafeInteger}
-        [isSafeInteger] on MDN}. *)
+       [isSafeInteger] on MDN}. *)
 
   val parse_float : Stdlib.String.t -> t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/parseFloat}
-        [parseFloat] on MDN}. *)
+       [parseFloat] on MDN}. *)
 
   val parse_int : string -> t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/parseInt}
-        [parseInt] on MDN}. *)
+       [parseInt] on MDN}. *)
 
   val parse_int_with_radix : radix:int -> string -> t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/parseInt}
-        [parseInt] on MDN}. *)
+       [parseInt] on MDN}. *)
 
   (** {2 Static properties} *)
 
@@ -299,18 +306,18 @@ module Number : sig
   val to_exponential : fraction_digits:int -> t -> Stdlib.String.t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/toExponential}
-        [toExponential] on MDN}. *)
+       [toExponential] on MDN}. *)
 
   val to_fixed : fraction_digits:int -> t -> Stdlib.String.t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/toFixed}
-        [toFixed] on MDN}. *)
+       [toFixed] on MDN}. *)
 
   val to_locale_string :
     locales:[< `String | `Array of [ `String ] ] obj -> t -> Stdlib.String.t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/toLocaleString}
-        [toLocaleString] on MDN}. *)
+       [toLocaleString] on MDN}. *)
 
   val to_locale_string_with_options :
     locales:[< `String | `Array of [ `String ] ] obj ->
@@ -319,22 +326,22 @@ module Number : sig
     Stdlib.String.t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/toLocaleString}
-        [toLocaleString] on MDN}. *)
+       [toLocaleString] on MDN}. *)
 
   val to_precision : precision:int -> t -> Stdlib.String.t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/toPrecision}
-        [toPrecision] on MDN}. *)
+       [toPrecision] on MDN}. *)
 
   val to_string : radix:int -> t -> Stdlib.String.t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/toString}
-        [toString] on MDN}. *)
+       [toString] on MDN}. *)
 
   val value_of : t -> t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Number/valueOf}
-        [valueOf] on MDN}. *)
+       [valueOf] on MDN}. *)
 end
 
 (** {2 String} *)
@@ -342,14 +349,14 @@ end
 type string = [ `String ] obj
 (** The JavaScript
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String}
-      String} type. *)
+     String} type. *)
 
 external string : Stdlib.String.t -> string = "%identity"
 (** Create a JavaScript String from an OCaml string. *)
 
 (** The JavaScript
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String}
-      String} class. *)
+     String} class. *)
 module String : sig
   type t = string
 
@@ -362,12 +369,12 @@ end
 type symbol = [ `Symbol ] obj
 (** The JavaScript
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol}
-      Symbol} type. *)
+     Symbol} type. *)
 
 val symbol : Stdlib.String.t -> symbol
 (** Create a
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/Symbol}
-      Symbol} with a description. *)
+     Symbol} with a description. *)
 
 module Symbol : sig
   type t = symbol
@@ -375,92 +382,92 @@ module Symbol : sig
   val make : unit -> t
   (** Create a
       {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/Symbol}
-        Symbol} using [Symbol()]. *)
+       Symbol} using [Symbol()]. *)
 
   val with_description : Stdlib.String.t -> t
   (** Create a
       {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/Symbol}
-        Symbol} with a description. *)
+       Symbol} with a description. *)
 
   val for_key : Stdlib.String.t -> t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/for} [for] on
-        MDN}. *)
+       MDN}. *)
 
   val key_for : t -> Stdlib.String.t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/keyFor}
-        [keyFor] on MDN}. *)
+       [keyFor] on MDN}. *)
 
   val has_instance : t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/hasInstance}
-        [hasInstance] on MDN}. *)
+       [hasInstance] on MDN}. *)
 
   val is_concat_spreadable : t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/isConcatSpreadable}
-        [isConcatSpreadable] on MDN}. *)
+       [isConcatSpreadable] on MDN}. *)
 
   val iterator : t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/iterator}
-        [iterator] on MDN}. *)
+       [iterator] on MDN}. *)
 
   val match' : t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/match} [match]
-        on MDN}. *)
+       on MDN}. *)
 
   val match_all : t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/match}
-        [matchAll] on MDN}. *)
+       [matchAll] on MDN}. *)
 
   val replace : t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/replace}
-        [replace] on MDN}. *)
+       [replace] on MDN}. *)
 
   val search : t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/search}
-        [search] on MDN}. *)
+       [search] on MDN}. *)
 
   val species : t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/species}
-        [species] on MDN}. *)
+       [species] on MDN}. *)
 
   val split : t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/split} [split]
-        on MDN}. *)
+       on MDN}. *)
 
   val to_primitive : t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/toPrimitive}
-        [toPrimitive] on MDN}. *)
+       [toPrimitive] on MDN}. *)
 
   val to_string_tag : t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/toStringTag}
-        [toStringTag] on MDN}. *)
+       [toStringTag] on MDN}. *)
 
   val unscopables : t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/unscopables}
-        [unscopables] on MDN}. *)
+       [unscopables] on MDN}. *)
 
   val to_string : t -> Stdlib.String.t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/toString}
-        [toString] on MDN}. *)
+       [toString] on MDN}. *)
 
   val value_of : t -> t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Symbol/valueOf}
-        [valueOf] on MDN}. *)
+       [valueOf] on MDN}. *)
 end
 
 (** {2 Array} *)
@@ -468,7 +475,7 @@ end
 type +'a array = [ `Array of 'a ] obj
 (** The JavaScript
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array}
-      Array} type. *)
+     Array} type. *)
 
 (* external array : 'a Stdlib.Array.t -> 'a array = "caml_js_from_array" *)
 val array : 'a Stdlib.Array.t -> 'a array
@@ -479,7 +486,7 @@ external list : 'a Stdlib.List.t -> 'a array = "caml_list_to_js_array"
 
 (** The JavaScript
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array}
-      Array} class. *)
+     Array} class. *)
 module Array : sig
   type +'a t = 'a array
 
@@ -487,6 +494,7 @@ module Array : sig
   external to_array : 'a t -> 'a Stdlib.Array.t = "caml_js_to_array"
   external of_list : 'a Stdlib.List.t -> 'a t = "caml_list_to_js_array"
   external to_list : 'a t -> 'a Stdlib.List.t = "caml_list_of_js_array"
+  val empty : unit -> 'a t
 end
 
 (** {2 Promise} *)
@@ -494,7 +502,7 @@ end
 type +'a promise = [ `Promise of 'a ] obj
 (** The JavaScript
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise}
-      Promise} type. *)
+     Promise} type. *)
 
 module Promise : sig
   type +'a t = 'a promise
@@ -505,14 +513,14 @@ end
 type bigint = [ `Bigint ] obj
 (** The JavaScript
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt}
-      BigInt} type. *)
+     BigInt} type. *)
 
 (** {2 Function} *)
 
 type func = [ `Func ] obj
 (** The JavaScript
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function}
-      Function} type. *)
+     Function} type. *)
 
 module Func : sig
   type t = func
@@ -522,32 +530,32 @@ module Func : sig
   val apply : this:'a obj -> args:any array -> t -> any
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/apply}
-        [apply] on MDN}. *)
+       [apply] on MDN}. *)
 
   val bind : this:'a obj -> args:any array -> t -> t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/bind} [bind]
-        on MDN}. *)
+       on MDN}. *)
 
   val call : this:'a obj -> args:any array -> t -> any
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/call} [call]
-        on MDN}. *)
+       on MDN}. *)
 
   val to_string : t -> Stdlib.String.t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/toString}
-        [toString] on MDN}. *)
+       [toString] on MDN}. *)
 
   val length : t -> int
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/length}
-        [length] on MDN}. *)
+       [length] on MDN}. *)
 
   val name : t -> Stdlib.String.t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/name} [name]
-        on MDN}. *)
+       on MDN}. *)
 end
 
 (** {2 Iterator} *)
@@ -555,7 +563,7 @@ end
 type 'a iterator = [ `Iterator of 'a ] obj
 (** The JavaScript
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator}
-      Iterator} type. *)
+     Iterator} type. *)
 
 module Iterator : sig
   type 'a t = 'a iterator
@@ -563,22 +571,24 @@ module Iterator : sig
   val make : unit -> 'a t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/Iterator}
-        [Iterator] on MDN}. *)
+       [Iterator] on MDN}. *)
 
   val from : _ obj -> 'a t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/from}
-        [from] on MDN}. *)
+       [from] on MDN}. *)
 
   val drop : int -> 'a t -> 'a t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/drop}
-        [drop] on MDN}. *)
+       [drop] on MDN}. *)
+
+  val every' : any -> 'a t -> bool
 
   val every : ('a -> int -> bool) -> 'a t -> bool
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/drop}
-        [drop] on MDN}. *)
+       [drop] on MDN}. *)
 end
 
 (** {1 Unicode}
@@ -604,23 +614,23 @@ end
 
     See
     {{:https://ocaml.org/manual/4.12/api/String.html} String in The OCaml
-      Manual}.
+     Manual}.
 
     See
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String}
-      String on MDN}. *)
-
-external utf16 : Stdlib.String.t -> Stdlib.String.t = "caml_jsstring_of_string"
-(** Transcode a string from UTF-8 to UTF-16. *)
-
-external utf8 : Stdlib.String.t -> Stdlib.String.t = "caml_string_of_jsstring"
-(** Transcode a string from UTF-16 to UTF-8. *)
+     String on MDN}. *)
 
 external unicode : Stdlib.String.t -> Stdlib.String.t
   = "caml_jsstring_of_string"
-(** Transcode a string from UTF-8 to UTF-16 for usage with JavaScript.
+(** Transcode a string from UTF-8 to UTF-16 for usage in JavaScript.
 
     This is an alias for {!val:utf16}. *)
+
+external utf16 : Stdlib.String.t -> Stdlib.String.t = "caml_jsstring_of_string"
+(** Transcode a string from UTF-8 to UTF-16 for usage in JavaScript. *)
+
+external utf8 : Stdlib.String.t -> Stdlib.String.t = "caml_string_of_jsstring"
+(** Transcode a string from UTF-16 to UTF-8 for usage in OCaml. *)
 
 (** {1 Math} *)
 
@@ -641,177 +651,177 @@ module Math : sig
   val abs : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/abs} [abs] on
-        MDN}. *)
+       MDN}. *)
 
   val acos : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/acos} [acos] on
-        MDN}. *)
+       MDN}. *)
 
   val acosh : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/acosh} [acosh] on
-        MDN}. *)
+       MDN}. *)
 
   val asin : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/asin} [asin] on
-        MDN}. *)
+       MDN}. *)
 
   val asinh : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/asinh} [asinh] on
-        MDN}. *)
+       MDN}. *)
 
   val atan : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/atan} [atan] on
-        MDN}. *)
+       MDN}. *)
 
   val atanh : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/atanh} [atanh] on
-        MDN}. *)
+       MDN}. *)
 
   val atan2 : number -> number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/atan2} [atan2] on
-        MDN}. *)
+       MDN}. *)
 
   val cbrt : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/cbrt} [cbrt] on
-        MDN}. *)
+       MDN}. *)
 
   val ceil : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/ceil} [ceil] on
-        MDN}. *)
+       MDN}. *)
 
   val clz32 : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/clz32} [clz32] on
-        MDN}. *)
+       MDN}. *)
 
   val cos : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/cos} [cos] on
-        MDN}. *)
+       MDN}. *)
 
   val cosh : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/cosh} [cosh] on
-        MDN}. *)
+       MDN}. *)
 
   val exp : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/exp} [exp] on
-        MDN}. *)
+       MDN}. *)
 
   val expm1 : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/expm1} [expm1] on
-        MDN}. *)
+       MDN}. *)
 
   val floor : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/floor} [floor] on
-        MDN}. *)
+       MDN}. *)
 
   val fround : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/fround} [fround]
-        on MDN}. *)
+       on MDN}. *)
 
   val hypot : number Stdlib.Array.t -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/hypot} [hypot] on
-        MDN}. *)
+       MDN}. *)
 
   val imul : number -> number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/imul} [imul] on
-        MDN}. *)
+       MDN}. *)
 
   val log : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/log} [log] on
-        MDN}. *)
+       MDN}. *)
 
   val log1p : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/log1p} [log1p] on
-        MDN}. *)
+       MDN}. *)
 
   val log10 : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/log10} [log10] on
-        MDN}. *)
+       MDN}. *)
 
   val log2 : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/log2} [log2] on
-        MDN}. *)
+       MDN}. *)
 
   val max : number Stdlib.Array.t -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/max} [max] on
-        MDN}. *)
+       MDN}. *)
 
   val min : number Stdlib.Array.t -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/min} [min] on
-        MDN}. *)
+       MDN}. *)
 
   val pow : number -> number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/pow} [pow] on
-        MDN}. *)
+       MDN}. *)
 
   val random : unit -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/random} [random]
-        on MDN}. *)
+       on MDN}. *)
 
   val round : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/round} [round] on
-        MDN}. *)
+       MDN}. *)
 
   val sign : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/sign} [sign] on
-        MDN}. *)
+       MDN}. *)
 
   val sin : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/sin} [sin] on
-        MDN}. *)
+       MDN}. *)
 
   val sinh : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/sinh} [sinh] on
-        MDN}. *)
+       MDN}. *)
 
   val sqrt : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/sqrt} [sqrt] on
-        MDN}. *)
+       MDN}. *)
 
   val tan : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/tan} [tan] on
-        MDN}. *)
+       MDN}. *)
 
   val tanh : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/tanh} [tanh] on
-        MDN}. *)
+       MDN}. *)
 
   val trunc : number -> number
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Math/trunc} [trunc] on
-        MDN}. *)
+       MDN}. *)
 end
 
 (** {1 Global} *)
@@ -819,7 +829,7 @@ end
 val global : any
 (** See
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis}
-      globalThis}.
+     globalThis}.
 
     {[
       let window : [ `Window ] Jx.obj = Jx.get Jx.global "window"
@@ -836,7 +846,7 @@ val global : any
 
     The following example defines bindings for the
     {{:https://developer.mozilla.org/en-US/docs/Web/API/Document/getElementById}
-      getElementById} method of the global
+     getElementById} method of the global
     {{:https://developer.mozilla.org/en-US/docs/Web/API/Document} document}
     object.
 
@@ -872,11 +882,11 @@ val global : any
     dynamic type-checking is performed. Binding authors should ensure that
     correct type conversions and coercions are used. *)
 
-(** {2:encode Encode}
-
-    Encode OCaml values into opaque JavaScript values. *)
+(** {2:encode Encode} *)
 
 module Encode : sig
+  (** Encode OCaml values into opaque JavaScript values. *)
+
   val unit : unit -> any
   (** Encode an OCaml unit value as a JavaScript [undefined] value. *)
 
@@ -895,6 +905,9 @@ module Encode : sig
   external unicode : Stdlib.String.t -> any = "caml_jsstring_of_string"
   (** Encode an OCaml UTF-8 string as a JavaScript UTF-16 string. *)
 
+  external ascii : Stdlib.String.t -> any = "%identity"
+  (** Encode an OCaml ASCII string as a JavaScript string. *)
+
   external string : Stdlib.String.t -> any = "%identity"
   (** Encode an OCaml ASCII string as a JavaScript string. *)
 
@@ -905,7 +918,7 @@ module Encode : sig
   (** Like {!val:array} but specialized for arrays of JavaScript objects. *)
 
   external any_array : 'a Stdlib.Array.t -> any = "caml_js_from_array"
-  (** Like {!val:array} but specialized for arrays generic values. *)
+  (** Like {!val:array} but specialized for arrays of generic values. *)
 
   val list : ('a -> any) -> 'a Stdlib.List.t -> any
   (** Encode an OCaml list as JavaScript array. *)
@@ -929,7 +942,8 @@ module Encode : sig
   (** Encode an OCaml option as JavaScript value that can be [undefined]. *)
 
   val obj_optional : 'a obj option -> any
-  (** Like {!val:undefined} but specialized for options of JavaScript objects. *)
+  (** Like {!val:undefined} but specialized for options of JavaScript objects.
+  *)
 
   val any_optional : 'a option -> any
   (** Like {!val:undefined} but specialized for options of generic values. *)
@@ -966,11 +980,11 @@ module Encode : sig
   end
 end
 
-(** {2:decode Decode}
-
-    Decode OCaml values from opaque JavaScript values. *)
+(** {2:decode Decode} *)
 
 module Decode : sig
+  (** Decode OCaml values from opaque JavaScript values. *)
+
   val unit : any -> unit
   (** Decode an OCaml unit value. *)
 
@@ -1014,7 +1028,8 @@ module Decode : sig
   (** Decode an OCaml option from a JavaScript value that can be [undefined]. *)
 
   val obj_optional : any -> 'a obj option
-  (** Like {!val:undefined} but specialized for options of JavaScript objects. *)
+  (** Like {!val:undefined} but specialized for options of JavaScript objects.
+  *)
 
   val field : 'c obj -> prop -> (any -> 'a) -> 'a
   (** Decode an object field. *)
@@ -1032,7 +1047,7 @@ end
 
 (** {2:raw Raw JavaScript}
 
-    The {!expr} and {!stmt} primitives embed untyped JavaScript code into the
+    The {!expr} and {!exec} primitives embed untyped JavaScript code into the
     compiled output.
 
     The textual representation of the code must be valid JavaScript, otherwise
@@ -1043,7 +1058,7 @@ end
     fallback to runtime and an error will be thrown (check the console for
     evaluation errors).
 
-    {b Warning:} {!expr} and {!stmt} are unsafe since no type-checking is
+    {b Warning:} {!expr} and {!exec} are unsafe since no type-checking is
     performed on the embedded code. *)
 
 external expr : Stdlib.String.t -> 'c obj = "caml_pure_js_expr"
@@ -1053,11 +1068,11 @@ external expr : Stdlib.String.t -> 'c obj = "caml_pure_js_expr"
       assert (Jx.Decode.int (Jx.expr "2 + 2") = 4)
     ]} *)
 
-external stmt : Stdlib.String.t -> unit = "caml_js_expr"
+external exec : Stdlib.String.t -> unit = "caml_js_expr"
 (** Unsafe JavaScript statement.
 
     {[
-      let () = Jx.stmt "console.log('hello')"
+      let () = Jx.exec "console.log('hello')"
     ]} *)
 
 (** {1 Debug} *)
@@ -1065,14 +1080,14 @@ external stmt : Stdlib.String.t -> unit = "caml_js_expr"
 val debug : 'a -> unit
 (** Print the runtime representation of a value using
     {{:https://developer.mozilla.org/en-US/docs/Web/API/console/debug_static}
-      console.debug}.*)
+     console.debug}.*)
 
 val log : 'a -> unit
 (** Print the runtime representation of a value using
     {{:https://developer.mozilla.org/en-US/docs/Web/API/console/log_static}
-      console.log}.*)
+     console.log}.*)
 
 external debugger : unit -> unit = "debugger"
 (** See
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/debugger}
-      debugger}. *)
+     debugger}. *)

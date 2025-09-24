@@ -134,6 +134,8 @@ module Array = struct
   external to_array : 'a t -> 'a Stdlib.Array.t = "caml_js_to_array"
   external of_list : 'a Stdlib.List.t -> 'a t = "caml_list_to_js_array"
   external to_list : 'a t -> 'a Stdlib.List.t = "caml_list_of_js_array"
+
+  let empty () = expr "[]"
 end
 
 (* Dict *)
@@ -322,4 +324,7 @@ module Iterator = struct
   let every callback_fn this =
     let callback_fn = E.func 2 callback_fn in
     D.bool (D.meth this "every" [| callback_fn |])
+
+  let every' callback_fn_any this =
+    D.bool (D.meth this "every" [| callback_fn_any |])
 end

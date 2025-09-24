@@ -6,6 +6,10 @@ let str_unicode_1 =
 let str_ascii_1 =
   String.concat " " [ "All"; "your"; "base"; "are"; "belong"; "to"; "us" ]
 
+(* let every_cb a b = b > 0 *)
+
+let global_f a b c = a + b + c
+
 (* NOTE: In the examples below [str ^ ""] is used to avoid implicit optimization of literal strings. *)
 let () =
   Jx.log "-- Value representation --";
@@ -52,8 +56,10 @@ let () =
   Jx.log "-- Embed JavaScript --";
   let _optimized_away = Jx.expr {|2 + 2|} in
   Jx.log (Jx.expr {|2 > 1 ? "static expr" : "no"|});
-  Jx.stmt "console.log('raw expr')";
-  Jx.stmt ("console.log" ^ "('raw expr 2')");
+  Jx.exec "console.log('raw expr')";
+  Jx.exec ("console.log" ^ "('raw expr 2')");
+  Jx.log (Jx.Decode.int (Jx.expr "2 + 2") = 4);
+
   Jx.log word_count;
   Jx.log (word_count str_ascii_1);
 
@@ -103,11 +109,6 @@ let () =
     (Jx.Func.apply ~this:Jx.null
        ~args:(Jx.array [| Jx.Encode.int 2; Jx.Encode.int 3 |])
        func1);
-
-  Jx.log "Jx.Iterator";
-  let it1 = Jx.Iterator.from (Jx.array [| 1; 2; 3 |]) in
-  Jx.log (Jx.Iterator.drop 5 it1);
-  Jx.log (Jx.Iterator.every (fun _ _ -> true) it1);
 
   let body =
     Document.query_selector ~selectors:"body" document |> Jx.Nullable.unsafe_get
@@ -173,4 +174,27 @@ let () =
   in
   Element.append ~nodes:[| incr; decr; reset |] body;
   Jx.log (Document.children document);
+
+  Jx.log "-- OCaml function literals ---";
+  Jx.log (fun x -> x);
+  Jx.log (fun x y -> x + y);
+  let local_f a b c = a + b + c in
+  Jx.log local_f;
+  Jx.log global_f;
+  (* NOTE: this uses caml_js_wrap_callback_strict *)
+  Jx.log (Jx.Encode.func 3 global_f);
+  Jx.log List.iter;
+
+  (* Jx.log "Jx.Iterator"; *)
+  (* let it1 = Jx.Iterator.from (Jx.array [| 1; 2; 3 |]) in *)
+  (* Jx.log (Jx.Iterator.drop 5 it1); *)
+  (* Jx.log (Jx.Iterator.every (fun _ _ -> true) it1); *)
+  (* Jx.log (Jx.Iterator.every' (Obj.magic every_cb) it1); *)
+  (*Jx.log (Jx.Iterator.every' (Obj.magic (fun _ _ -> true)) it1);*)
+  (*Jx.log*)
+  (*  (Jx.Iterator.every'*)
+  (*     (Obj.magic*)
+  (*        (let inner _ = true in*)
+  (*         fun _ -> inner))*)
+  (*     it1);*)
   ()
