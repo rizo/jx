@@ -91,8 +91,8 @@ end
     JavaScript objects with values of the same type.
 
     {@ocaml[
-      Jx.log (Jx.dict [| ("k1", 101); ("k2", 102); ("k3", 103) |])
-      (* { "k1": 101, "k2": 102, "k3": 103 } *)
+    Jx.log (Jx.dict [| ("k1", 101); ("k2", 102); ("k3", 103) |])
+    (* { "k1": 101, "k2": 102, "k3": 103 } *)
     ]} *)
 
 type +'a dict = [ `Dict of 'a ] obj
@@ -139,12 +139,12 @@ module Nullable : sig
       {!val:null}, and [default] otherwise.
 
       {[
-        Nullable.map_or 0 (fun x -> x + 1) nullable
+      Nullable.map_or 0 (fun x -> x + 1) nullable
       ]} *)
 
   val map_or_else : (unit -> 'b) -> ('a -> 'b) -> 'a t -> 'b
   (** {[
-        Nullable.map_or_else (fun () -> 0) (fun x -> x + 1) nullable
+      Nullable.map_or_else (fun () -> 0) (fun x -> x + 1) nullable
       ]} *)
 end
 
@@ -174,12 +174,12 @@ module Undefined : sig
 
   val map_or : 'b -> ('a -> 'b) -> 'a t -> 'b
   (** {[
-        undefined.map_or 0 (fun x -> x + 1) undefined
+      undefined.map_or 0 (fun x -> x + 1) undefined
       ]} *)
 
   val map_or_else : (unit -> 'b) -> ('a -> 'b) -> 'a t -> 'b
   (** {[
-        Undefined.map_or_else (fun () -> 0) (fun x -> x + 1) undefined
+      Undefined.map_or_else (fun () -> 0) (fun x -> x + 1) undefined
       ]} *)
 end
 
@@ -477,8 +477,7 @@ type +'a array = [ `Array of 'a ] obj
     {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array}
      Array} type. *)
 
-(* external array : 'a Stdlib.Array.t -> 'a array = "caml_js_from_array" *)
-val array : 'a Stdlib.Array.t -> 'a array
+external array : 'a Stdlib.Array.t -> 'a array = "caml_js_from_array"
 (** Create a JavaScript Array from an OCaml array. *)
 
 external list : 'a Stdlib.List.t -> 'a array = "caml_list_to_js_array"
@@ -532,12 +531,12 @@ module Func : sig
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/apply}
        [apply] on MDN}. *)
 
-  val bind : this:'a obj -> args:any array -> t -> t
+  val bind : t -> any Stdlib.Array.t -> t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/bind} [bind]
        on MDN}. *)
 
-  val call : this:'a obj -> args:any array -> t -> any
+  val call : t -> any Stdlib.Array.t -> any
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/API/Function/call} [call]
        on MDN}. *)
@@ -568,11 +567,6 @@ type 'a iterator = [ `Iterator of 'a ] obj
 module Iterator : sig
   type 'a t = 'a iterator
 
-  val make : unit -> 'a t
-  (** See
-      {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/Iterator}
-       [Iterator] on MDN}. *)
-
   val from : _ obj -> 'a t
   (** See
       {{:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Iterator/from}
@@ -596,7 +590,7 @@ end
     Use {!val:unicode} when passing a Unicode string from OCaml to JavaScript.
 
     {[
-      Jx.log (Jx.unicode "Olá, OCaml! 🐫")
+    Jx.log (Jx.unicode "Olá, OCaml! 🐫")
     ]}
 
     This is needed because the Unicode encoding in JavaScript and OCaml are
@@ -832,7 +826,7 @@ val global : any
      globalThis}.
 
     {[
-      let window : [ `Window ] Jx.obj = Jx.get Jx.global "window"
+    let window : [ `Window ] Jx.obj = Jx.get Jx.global "window"
     ]} *)
 
 (* {b Note:} Library authors who want to publish their bindings should consider
@@ -851,20 +845,20 @@ val global : any
     object.
 
     {[
-      module E = Jx.Encode
-      module D = Jx.Decode
+    module E = Jx.Encode
+    module D = Jx.Decode
 
-      type document = [ `Document ] Jx.obj
-      type element = [ `Element ] Jx.obj
+    type document = [ `Document ] Jx.obj
+    type element = [ `Element ] Jx.obj
 
-      (* Bind the global document object. *)
-      let document : document = Jx.expr "document"
+    (* Bind the global document object. *)
+    let document : document = Jx.expr "document"
 
-      (* Bind the getElementById method call. *)
-      let get_element_by_id id : element =
-        D.obj (D.meth document "getElementById" [| E.string id |])
+    (* Bind the getElementById method call. *)
+    let get_element_by_id id : element =
+      D.obj (D.meth document "getElementById" [| E.string id |])
 
-      let () = Jx.log (get_element_by_id "container")
+    let () = Jx.log (get_element_by_id "container")
     ]}
 
     Which generates the following code (in addition to the OCaml runtime):
@@ -1065,14 +1059,14 @@ external expr : Stdlib.String.t -> 'c obj = "caml_pure_js_expr"
 (** Unsafe JavaScript expression.
 
     {[
-      assert (Jx.Decode.int (Jx.expr "2 + 2") = 4)
+    assert (Jx.Decode.int (Jx.expr "2 + 2") = 4)
     ]} *)
 
 external exec : Stdlib.String.t -> unit = "caml_js_expr"
 (** Unsafe JavaScript statement.
 
     {[
-      let () = Jx.exec "console.log('hello')"
+    let () = Jx.exec "console.log('hello')"
     ]} *)
 
 (** {1 Debug} *)

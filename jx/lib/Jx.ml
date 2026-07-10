@@ -121,7 +121,7 @@ module Symbol = struct
   let to_primitive = expr "Symbol.toPrimitive"
   let to_string_tag = expr "Symbol.toStringTag"
   let unscopables = expr "Symbol.unscopables"
-  let to_string sym = D.string (D.func (expr "Symbol.toString") [| E.obj sym |])
+  let to_string sym = D.string (D.meth sym "toString" [||])
   let value_of this = D.meth this "valueOf" [||]
 end
 
@@ -304,11 +304,8 @@ module Func = struct
 
   let make args = obj_new (expr "Function") (E.Array.any args)
   let apply ~this ~args func = D.meth func "apply" [| E.obj this; E.obj args |]
-
-  let bind ~this ~args func =
-    D.obj (D.meth func "bind" [| E.obj this; E.obj args |])
-
-  let call ~this ~args func = D.meth func "call" [| E.obj this; E.obj args |]
+  let bind func args = D.obj (D.meth func "bind" args)
+  let call func args = D.meth func "call" args
   let to_string this = D.string (D.meth this "toString" [||])
   let length this = D.int (D.meth this "length" [||])
   let name this = D.string (D.meth this "name" [||])
@@ -317,7 +314,6 @@ end
 module Iterator = struct
   type 'a t = 'a iterator
 
-  let make () = obj_new (expr "Iterator") [||]
   let from obj = D.obj (D.func (expr "Iterator.from") [| E.obj obj |])
   let drop limit this = D.obj (D.meth this "drop" [| E.int limit |])
 

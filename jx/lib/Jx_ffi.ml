@@ -172,7 +172,10 @@ module Encode = struct
 
   (* nullable *)
 
-  external any_nullable : 'a option -> any = "%identity"
+  let any_nullable opt =
+    match opt with
+    | None -> obj null
+    | Some x -> any x
 
   let obj_nullable opt =
     match opt with
@@ -186,7 +189,10 @@ module Encode = struct
 
   (* undefined *)
 
-  external any_undefined : 'a option -> any = "%identity"
+  let any_undefined opt =
+    match opt with
+    | None -> obj undefined
+    | Some x -> any x
 
   let obj_undefined opt =
     match opt with
@@ -330,10 +336,7 @@ let symbol str : symbol =
 
 type +'a array = [ `Array of 'a ] obj
 
-(* external array : 'a Stdlib.Array.t -> 'a array = "caml_js_from_array" *)
-
-let array values = obj_new (expr "Array") (Encode.Array.any values)
-
+external array : 'a Stdlib.Array.t -> 'a array = "caml_js_from_array"
 external list : 'a Stdlib.List.t -> 'a array = "caml_list_to_js_array"
 
 (* Function *)
