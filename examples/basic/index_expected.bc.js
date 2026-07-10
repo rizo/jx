@@ -10341,7 +10341,7 @@ h=a.jsoo_runtime,cM="caml_unix_stat_64",cL="unix_lseek",k="caml_unix_inchannel_o
   (globalThis));
 
 //# 4 "../../lib/.jx.objs/jsoo/effects=disabled/jx.cma.js"
-//# shape: Jx:[[],[],N,N,N,N,N,F(1),N,F(1),F(1)]
+//# shape: Jx:[[],[],N,N,N,F(1),N,F(1),F(1)]
 (function
   (globalThis){
    "use strict";
@@ -10360,8 +10360,6 @@ h=a.jsoo_runtime,cM="caml_unix_stat_64",cL="unix_lseek",k="caml_unix_inchannel_o
       [0],
       null$,
       undefined$,
-      true,
-      false,
       global_this,
       global,
       console$0,
@@ -10385,12 +10383,12 @@ h=a.jsoo_runtime,cM="caml_unix_stat_64",cL="unix_lseek",k="caml_unix_inchannel_o
        tags: runtime.caml_js_from_array([0, "admin", "active"])},
     math = Math,
     x10_f = x10;
-   Jx[10].call(null, user);
-   Jx[10].call(null, {math: 42, logic: 99});
+   Jx[8].call(null, user);
+   Jx[8].call(null, {math: 42, logic: 99});
    var a = math.max(4, 15);
-   Jx[10].call(null, a);
+   Jx[8].call(null, a);
    var b = x10_f(54321), a = math.max(10, b);
-   Jx[10].call(null, a);
+   Jx[8].call(null, a);
    runtime.caml_register_global([0], "Dune__exe__Index");
    return;
   }

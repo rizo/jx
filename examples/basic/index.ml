@@ -13,7 +13,7 @@ let user =
 
 let scores = Jx.obj [| ("math", E.int 42); ("logic", E.int 99) |]
 let math = Jx.expr "Math"
-let math_max a b = Jx.meth math "max" [| E.int a; E.int b |]
+let math_max a b = Jx.obj_call math "max" [| E.int a; E.int b |]
 let x10_f = Jx.expr "x10"
 let x10 n = Jx.call x10_f [| E.int n |]
 

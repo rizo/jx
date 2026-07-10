@@ -2,20 +2,21 @@ type t
 
 external expr : string -> t = "caml_pure_js_expr"
 external exec : string -> unit = "caml_js_expr"
-external get : t -> string -> t = "caml_js_get"
-external set : t -> string -> t -> unit = "caml_js_set"
-external del : t -> string -> unit = "caml_js_delete"
-external new_obj : t -> t array -> t = "caml_js_new"
 external equal : t -> t -> bool = "caml_js_equals"
 external strict_equal : t -> t -> bool = "caml_js_strict_equals"
 external typeof : t -> string = "caml_js_typeof"
 external instanceof : t -> constr:t -> bool = "caml_js_instanceof"
 external obj : (string * 'a) array -> t = "caml_js_object"
+external obj_get : t -> string -> t = "caml_js_get"
+external obj_set : t -> string -> t -> unit = "caml_js_set"
+external obj_delete : t -> string -> unit = "caml_js_delete"
+external obj_new : t -> t array -> t = "caml_js_new"
+external obj_call : t -> string -> t array -> t = "caml_js_meth_call"
+external arr_get : t -> int -> t = "caml_js_get"
+external arr_set : t -> int -> t -> unit = "caml_js_set"
+external arr_delete : t -> int -> unit = "caml_js_delete"
 external call : t -> t array -> t = "caml_js_fun_call"
-external meth : t -> string -> t array -> t = "caml_js_meth_call"
 external debugger : unit -> unit = "debugger"
-
-(** {JavaScript values} *)
 
 module Encode = struct
   external any : 'a -> t = "%identity"
@@ -27,12 +28,11 @@ module Encode = struct
   external float : float -> t = "caml_js_from_float"
   external string : string -> t = "%identity"
   external ascii : string -> t = "%identity"
+  external unicode : string -> string = "caml_jsstring_of_string"
   external array : 'a array -> t = "caml_js_from_array"
   external list : 'a list -> t = "caml_list_to_js_array"
   external func : int -> (_ -> _) -> t = "caml_js_wrap_callback_strict"
 end
-
-(** {OCaml values} *)
 
 module Decode = struct
   external any : t -> 'a = "%identity"
@@ -47,26 +47,18 @@ module Decode = struct
   external unicode : t -> string = "caml_string_of_jsstring"
 end
 
-(* {1 Unicode} *)
-
-external unicode : string -> string = "caml_jsstring_of_string"
-external utf16 : string -> string = "caml_jsstring_of_string"
-external utf8 : string -> string = "caml_string_of_jsstring"
-
 (* {1 Expressions} *)
 
 let null : t = expr "null"
 let undefined : t = expr "undefined"
-let true' : t = expr "true"
-let false' : t = expr "false"
 let global_this : t = expr "globalThis"
-let global prop : t = get global_this prop
+let global prop : t = obj_get global_this prop
 let console : t = expr "console"
 
 let log a =
-  let _ = meth console "log" [| Encode.any a |] in
+  let _ = obj_call console "log" [| Encode.any a |] in
   ()
 
 let debug a =
-  let _ = meth console "debug" [| Encode.any a |] in
+  let _ = obj_call console "debug" [| Encode.any a |] in
   ()
