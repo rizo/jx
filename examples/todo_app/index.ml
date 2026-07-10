@@ -127,7 +127,7 @@ let () =
   B.add_event_listener input "input" (fun _event ->
       let text = B.String.trim (B.value input) in
       B.set_disabled add_button (B.String.is_empty text));
-  B.add_event_listener (Jx.get input "form") "submit" (fun event ->
+  B.add_event_listener (Jx.obj_get input "form") "submit" (fun event ->
       B.prevent_default event;
       let text = B.String.trim (B.value input) in
       if not (B.String.is_empty text) then (

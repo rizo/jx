@@ -17,6 +17,14 @@ external arr_delete : t -> int -> unit = "caml_js_delete"
 external call : t -> t array -> t = "caml_js_fun_call"
 external debugger : unit -> unit = "debugger"
 
+let null : t = expr "null"
+let undefined : t = expr "undefined"
+let global_this : t = expr "globalThis"
+let global prop : t = obj_get global_this prop
+let console : t = expr "console"
+let is_null t = strict_equal t null
+let is_undefined t = strict_equal t undefined
+
 module Encode = struct
   external any : 'a -> t = "%identity"
   external bool : bool -> t = "caml_js_from_bool"
@@ -32,28 +40,33 @@ module Encode = struct
   external array : 'a array -> t = "caml_js_from_array"
   external list : 'a list -> t = "caml_list_to_js_array"
   external func : int -> (_ -> _) -> t = "caml_js_wrap_callback_strict"
+
+  let nullable x =
+    match x with
+    | None -> null
+    | Some x -> any x
+
+  let optional x =
+    match x with
+    | None -> undefined
+    | Some x -> any x
 end
 
 module Decode = struct
   external any : t -> 'a = "%identity"
-  external array : t -> 'a array = "caml_js_to_array"
+  external array : t -> t array = "caml_js_to_array"
   external bool : t -> bool = "caml_js_to_bool"
   external char : t -> char = "%identity"
   external float : t -> float = "caml_js_to_float"
   external int : t -> int = "%identity"
-  external list : t -> 'a list = "caml_list_of_js_array"
+  external list : t -> t list = "caml_list_of_js_array"
   external ascii : t -> string = "%identity"
   external string : t -> string = "%identity"
   external unicode : t -> string = "caml_string_of_jsstring"
+
+  let nullable x = if is_null x then None else Some x
+  let optional x = if is_undefined x then None else Some x
 end
-
-(* {1 Expressions} *)
-
-let null : t = expr "null"
-let undefined : t = expr "undefined"
-let global_this : t = expr "globalThis"
-let global prop : t = obj_get global_this prop
-let console : t = expr "console"
 
 let log a =
   let _ = obj_call console "log" [| Encode.any a |] in
