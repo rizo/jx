@@ -2,7 +2,6 @@ type t
 
 external expr : string -> t = "caml_pure_js_expr"
 external exec : string -> unit = "caml_js_expr"
-external magic : t -> 'a = "%identity"
 external get : t -> string -> t = "caml_js_get"
 external set : t -> string -> t -> unit = "caml_js_set"
 external del : t -> string -> unit = "caml_js_delete"
@@ -36,6 +35,7 @@ end
 (** {OCaml values} *)
 
 module Decode = struct
+  external any : t -> 'a = "%identity"
   external array : t -> 'a array = "caml_js_to_array"
   external bool : t -> bool = "caml_js_to_bool"
   external char : t -> char = "%identity"
