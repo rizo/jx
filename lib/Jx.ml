@@ -2,7 +2,6 @@ type t
 
 external expr : string -> t = "caml_pure_js_expr"
 external exec : string -> unit = "caml_js_expr"
-external any : 'a -> t = "%identity"
 external magic : t -> 'a = "%identity"
 external get : t -> string -> t = "caml_js_get"
 external set : t -> string -> t -> unit = "caml_js_set"
@@ -20,6 +19,7 @@ external debugger : unit -> unit = "debugger"
 (** {JavaScript values} *)
 
 module Encode = struct
+  external any : 'a -> t = "%identity"
   external bool : bool -> t = "caml_js_from_bool"
   external char : char -> t = "%identity"
   external int : int -> t = "%identity"
@@ -64,5 +64,9 @@ let global prop : t = get global_this prop
 let console : t = expr "console"
 
 let log a =
-  let _ = meth console "log" [| a |] in
+  let _ = meth console "log" [| Encode.any a |] in
+  ()
+
+let debug a =
+  let _ = meth console "debug" [| Encode.any a |] in
   ()

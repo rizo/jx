@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <title>Basic Jx test</title>
   <script type="text/javascript">
-    function x10(x) {
-      return x * 10;
+    function x10(x, times) {
+      return x * (times === undefined ? 10 : times);
     }
   </script>
 </head>

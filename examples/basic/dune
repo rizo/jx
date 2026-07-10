@@ -3,3 +3,11 @@
  (libraries jx)
  (modes js))
 
+(rule
+ (alias runtest)
+ (deps
+  (file index.html)
+  (file index.bc.js)
+  (file index_expected.bc.js))
+ (action
+  (diff index_expected.bc.js index.bc.js)))
