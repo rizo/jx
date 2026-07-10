@@ -1,0 +1,5 @@
+(executable
+ (name index)
+ (libraries jx)
+ (modes js))
+
