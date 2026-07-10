@@ -4,14 +4,14 @@ open struct
 end
 
 let user =
-  Jx.obj
+  E.obj
     [|
       ("name", E.string "Ada");
       ("score", E.int 42);
       ("tags", E.array [| E.string "admin"; E.string "active" |]);
     |]
 
-let scores = Jx.obj [| ("math", E.int 42); ("logic", E.int 99) |]
+let scores = E.obj [| ("math", E.int 42); ("logic", E.int 99) |]
 let math = Jx.expr "Math"
 let math_max a b = Jx.obj_call math "max" [| E.int a; E.int b |]
 let x10_f = Jx.expr "x10"
