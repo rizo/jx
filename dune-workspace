@@ -11,6 +11,10 @@
     --target-env=browser
     --no-sourcemap
     --opt=3
+    --enable=deadcode
+    --enable=globaldeadcode
+    --enable=inline
+    --enable=use-js-string
     --no-extern-fs)
    (link_flags)
    (sourcemap no))))
